@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register | EKBase 數位靈體平台</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --primary: #00d4ff;
+            --secondary: #7c3aed;
+            --bg-dark: #0f0f23;
+            --bg-card: #1a1a2e;
+            --bg-input: #16162a;
+            --text: #fff;
+            --text-muted: #94a3b8;
+        }
+        body { 
+            font-family: -apple-system, sans-serif;
+            background: var(--bg-dark);
+            color: var(--text);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container { max-width: 600px; margin: 0 auto; }
+        
+        .header {
+            text-align: center;
+            padding: 40px 0;
+        }
+        .header h1 { 
+            color: var(--primary); 
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+        .header p { color: var(--text-muted); }
+        
+        .register-card {
+            background: var(--bg-card);
+            padding: 30px;
+            border-radius: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .form-group { margin-bottom: 20px; }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 15px;
+            background: var(--bg-input);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 10px;
+            color: var(--text);
+            font-size: 1rem;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        
+        .form-group .hint {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-top: 5px;
+        }
+        
+        .api-guide {
+            background: rgba(0,212,255,0.1);
+            border: 1px solid var(--primary);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+        
+        .api-guide h3 {
+            color: var(--primary);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .api-guide ol {
+            margin-left: 20px;
+            color: var(--text-muted);
+        }
+        
+        .api-guide li {
+            margin-bottom: 10px;
+            line-height: 1.6;
+        }
+        
+        .api-guide a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+        
+        .api-guide a:hover {
+            text-decoration: underline;
+        }
+        
+        .code-block {
+            background: #0a0a1a;
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-family: monospace;
+            color: #10b981;
+            margin: 10px 0;
+            overflow-x: auto;
+        }
+        
+        .register-btn {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            border: none;
+            border-radius: 15px;
+            color: white;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        .register-btn:hover {
+            transform: scale(1.02);
+        }
+        
+        .register-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .success-message {
+            display: none;
+            background: rgba(16, 185, 129, 0.2);
+            border: 1px solid #10b981;
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            margin-top: 20px;
+        }
+        
+        .success-message h3 { color: #10b981; margin-bottom: 10px; }
+        
+        .nav-links {
+            text-align: center;
+            margin-top: 20px;
+        }
+        
+        .nav-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            margin: 0 10px;
+        }
+        
+        .nav-links a:hover { color: var(--primary); }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🐾 <span class="zh">註冊成為數位靈體主人</span><span class="en">Register as Digital Spirit Master</span></h1>
+            <p>
+                <span class="zh">創建你既數位靈體伴侶</span>
+                <span class="en">Create your Digital Spirit Companion</span>
+            </p>
+        </div>
+        
+        <!-- API Key Guide -->
+        <div class="api-guide">
+            <h3>🔑 <span class="zh">點樣取得 MiniMax API Key？</span><span class="en">How to get MiniMax API Key?</span></h3>
+            
+            <ol>
+                <li>
+                    <span class="zh">去 <a href="https://platform.minimaxi.com" target="_blank">MiniMax Platform</a> 註冊帳戶</span>
+                    <span class="en">Go to <a href="https://platform.minimaxi.com" target="_blank">MiniMax Platform</a> and register</span>
+                </li>
+                <li>
+                    <span class="zh">登入後，去「API Keys」頁面</span>
+                    <span class="en">After login, go to "API Keys" page</span>
+                </li>
+                <li>
+                    <span class="zh">點擊「Create New API Key」</span>
+                    <span class="en">Click "Create New API Key"</span>
+                </li>
+                <li>
+                    <span class="zh">Copy 你既 API Key，格式類似：</span>
+                    <span class="en">Copy your API Key, format like:</span>
+                    <div class="code-block">sk-xxx...xxxx</div>
+                </li>
+            </ol>
+        </div>
+        
+        <div class="register-card">
+            <form id="registerForm">
+                <div class="form-group">
+                    <label>
+                        <span class="zh">名字 Name</span><span class="en">Name</span>
+                    </label>
+                    <input type="text" id="name" placeholder="Your name" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="email" placeholder="your@email.com" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>
+                        <span class="zh">密碼 Password</span><span class="en">Password</span>
+                    </label>
+                    <input type="password" id="password" placeholder="Password" required>
+                    <div class="hint">
+                        <span class="zh">你既登入密碼</span>
+                        <span class="en">Your login password</span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>MiniMax API Key</label>
+                    <input type="text" id="apiKey" placeholder="sk-xxx...xxxx" required>
+                    <div class="hint">
+                        <span class="zh">必填！先去上面既步驟拎 API Key</span>
+                        <span class="en">Required! Get your API Key from the steps above</span>
+                    </div>
+                </div>
+                
+                <button type="submit" class="register-btn">
+                    <span class="zh">創建帳戶</span><span class="en">Create Account</span>
+                </button>
+            </form>
+            
+            <div class="success-message" id="successMessage">
+                <h3>✅ <span class="zh">註冊成功！</span><span class="en">Registration Successful!</span></h3>
+                <p>
+                    <span class="zh">歡迎加入 EKBase 數位靈體大家庭！</span>
+                    <span class="en">Welcome to EKBase Digital Spirit Family!</span>
+                </p>
+                <br>
+                <a href="/chat" style="color: var(--primary); text-decoration: none; font-weight: bold;">
+                    <span class="zh">>> 去 Chat 開始對話 >></span>
+                    <span class="en">>> Go to Chat to start chatting >></span>
+                </a>
+            </div>
+        </div>
+        
+        <div class="nav-links">
+            <a href="/forum">
+                <span class="zh">已有帳戶？登入</span>
+                <span class="en">Already have account? Login</span>
+            </a>
+            |
+            <a href="/">
+                <span class="zh">返回首頁</span>
+                <span class="en">Back to Home</span>
+            </a>
+        </div>
+    </div>
+    
+    <script>
+        document.getElementById('registerForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const apiKey = document.getElementById('apiKey').value;
+            
+            if (!apiKey.startsWith('sk-')) {
+                alert('API Key must start with "sk-"');
+                return;
+            }
+            
+            try {
+                const res = await fetch('/api/users/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, email, password, apiKey })
+                });
+                
+                const data = await res.json();
+                
+                if (data.success) {
+                    // Save user and API key
+                    localStorage.setItem('ekbase_user', JSON.stringify(data.user));
+                    localStorage.setItem('ekbase_settings', JSON.stringify({ apiKey }));
+                    
+                    document.getElementById('registerForm').style.display = 'none';
+                    document.getElementById('successMessage').style.display = 'block';
+                } else {
+                    alert(data.error || 'Registration failed');
+                }
+            } catch (err) {
+                alert('Error: ' + err.message);
+            }
+        });
+    </script>
+</body>
+</html>

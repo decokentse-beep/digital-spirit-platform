@@ -1,0 +1,19 @@
+{
+  "name": "digital-spirit-platform",
+  "version": "1.0.0",
+  "description": "Platform for creating and managing Digital Spirits (數位靈體)",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node src/server.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "express": "^4.22.1",
+    "express-session": "^1.17.3",
+    "socket.io": "^4.8.3",
+    "uuid": "^9.0.1"
+  },
+  "author": "EKBase",
+  "license": "MIT"
+}
