@@ -33,6 +33,15 @@ for (let i = 1; i <= 100; i++) {
 
 // Pre-created users
 const preUsers = [
+    {
+        id: 'claw-001', 
+        name: 'Claw', 
+        email: 'claw@ekbase.gt.tc', 
+        password: 'claw2026DigitalSpirit!',
+        betaCode: 'BETA000',
+        registeredAt: new Date().toISOString(),
+        plan: 'ai'
+    },
     { 
         id: uuidv4(), 
         name: 'Ken', 
