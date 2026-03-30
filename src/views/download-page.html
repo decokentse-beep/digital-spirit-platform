@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>下載Driver | Download Driver - EKBase Digital Spirit</title>
+    <style>
+        :root {
+            --primary: #00d4ff;
+            --success: #10b981;
+            --bg-dark: #1a1a2e;
+            --bg-darker: #16213e;
+            --text: #fff;
+            --text-muted: #94a3b8;
+        }
+        body { 
+            font-family: -apple-system, sans-serif;
+            background: linear-gradient(135deg, var(--bg-dark) 0%, var(--bg-darker) 100%);
+            min-height: 100vh;
+            color: var(--text);
+            padding: 30px;
+        }
+        .container { max-width: 700px; margin: 0 auto; }
+        h1 { color: var(--primary); text-align: center; margin-bottom: 10px; }
+        .subtitle { color: var(--text-muted); text-align: center; margin-bottom: 30px; }
+        .status-box {
+            background: rgba(255,255,255,0.05);
+            padding: 25px;
+            border-radius: 12px;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .status-box.locked { border: 2px solid var(--text-muted); }
+        .status-box.unlocked { border: 2px solid var(--success); }
+        .status-icon { font-size: 3rem; margin-bottom: 15px; }
+        .files { text-align: left; }
+        .file-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+        .file-name { font-weight: bold; }
+        .file-desc { color: var(--text-muted); font-size: 0.85rem; }
+        .btn {
+            display: inline-block;
+            padding: 12px 24px;
+            background: var(--primary);
+            color: #000;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: bold;
+        }
+        .btn.disabled {
+            background: var(--text-muted);
+            cursor: not-allowed;
+        }
+        .requirements {
+            background: rgba(255,255,255,0.05);
+            padding: 20px;
+            border-radius: 12px;
+            margin-top: 20px;
+        }
+        .requirements h3 { margin-bottom: 10px; }
+        .requirements ul { margin-left: 20px; color: var(--text-muted); }
+        .nav-back { color: var(--primary); text-decoration: none; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="/profile" class="nav-back">← 返回個人檔案</a>
+        
+        <h1>🐾 下載 Digital Spirit Driver</h1>
+        <p class="subtitle">建立你專屬的數位靈體</p>
+        
+        <div class="status-box locked" id="statusBox">
+            <div class="status-icon" id="statusIcon">🔒</div>
+            <p id="statusText">請先完成付款才能下載</p>
+            <a href="/payment" class="btn" id="paymentBtn">前往付款</a>
+        </div>
+        
+        <div class="files" id="filesList" style="display:none;">
+            <h3 style="margin-bottom:15px;">📦 下載檔案</h3>
+            
+            <div class="file-item">
+                <div>
+                    <div class="file-name">driver.py</div>
+                    <div class="file-desc">主程式 ~10KB</div>
+                </div>
+                <a href="#" class="btn" onclick="downloadFile('driver.py')">下載</a>
+            </div>
+            
+            <div class="file-item">
+                <div>
+                    <div class="file-name">telegram-bridge.py</div>
+                    <div class="file-desc">Telegram橋樑 ~5KB</div>
+                </div>
+                <a href="#" class="btn" onclick="downloadFile('telegram-bridge.py')">下載</a>
+            </div>
+            
+            <div class="file-item">
+                <div>
+                    <div class="file-name">setup.bat</div>
+                    <div class="file-desc">Windows安裝腳本 ~1KB</div>
+                </div>
+                <a href="#" class="btn" onclick="downloadFile('setup.bat')">下載</a>
+            </div>
+            
+            <div class="file-item">
+                <div>
+                    <div class="file-name">README.md</div>
+                    <div class="file-desc">說明文件</div>
+                </div>
+                <a href="#" class="btn" onclick="downloadFile('README.md')">下載</a>
+            </div>
+        </div>
+        
+        <div class="requirements">
+            <h3>📋 安裝需求</h3>
+            <ul>
+                <li>Python 3.8 或以上</li>
+                <li>MiniMax API Key（論壇會提供）</li>
+                <li>Telegram Bot Token（如需要Telegram整合）</li>
+            </ul>
+        </div>
+    </div>
+    
+    <script>
+        async function checkPayment() {
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            if (!user.email) {
+                document.getElementById('statusText').textContent = '請先登入';
+                document.getElementById('paymentBtn').href = '/login';
+                return;
+            }
+            
+            try {
+                const res = await fetch(`/api/payment/status?email=${user.email}`);
+                const data = await res.json();
+                
+                if (data.paid) {
+                    document.getElementById('statusBox').classList.remove('locked');
+                    document.getElementById('statusBox').classList.add('unlocked');
+                    document.getElementById('statusIcon').textContent = '🔓';
+                    document.getElementById('statusText').textContent = '✅ 付款已完成！可以下載 Driver';
+                    document.getElementById('paymentBtn').style.display = 'none';
+                    document.getElementById('filesList').style.display = 'block';
+                } else if (data.status === 'pending_review') {
+                    document.getElementById('statusText').textContent = '⏳ 付款截圖正在審核中，請稍候';
+                    document.getElementById('paymentBtn').textContent = '返回個人檔案';
+                    document.getElementById('paymentBtn').href = '/profile';
+                } else {
+                    document.getElementById('statusText').textContent = '請先完成付款才能下載';
+                    document.getElementById('paymentBtn').href = '/payment';
+                }
+            } catch (err) {
+                console.error('Check payment error:', err);
+            }
+        }
+        
+        function downloadFile(filename) {
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            if (!user.email) {
+                alert('請先登入');
+                return;
+            }
+            window.location.href = `/api/driver/download/${filename}?email=${user.email}`;
+        }
+        
+        checkPayment();
+    </script>
+</body>
+</html>

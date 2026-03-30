@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>登入 | Login - EKBase Digital Spirit</title>
+    <style>
+        :root {
+            --primary: #00d4ff;
+            --bg-dark: #1a1a2e;
+            --bg-darker: #16213e;
+            --text: #fff;
+            --text-muted: #94a3b8;
+        }
+        body { 
+            font-family: -apple-system, sans-serif;
+            background: linear-gradient(135deg, var(--bg-dark) 0%, var(--bg-darker) 100%);
+            min-height: 100vh;
+            color: var(--text);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .login-box {
+            background: rgba(255,255,255,0.05);
+            padding: 40px;
+            border-radius: 20px;
+            width: 100%;
+            max-width: 400px;
+        }
+        h1 { color: var(--primary); text-align: center; margin-bottom: 30px; }
+        .form-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 8px; color: var(--text-muted); }
+        input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 8px;
+            background: rgba(0,0,0,0.3);
+            color: var(--text);
+            font-size: 1rem;
+        }
+        input:focus { outline: none; border-color: var(--primary); }
+        .btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(90deg, var(--primary), #7c3aed);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .btn:hover { opacity: 0.9; }
+        .links {
+            text-align: center;
+            margin-top: 20px;
+            color: var(--text-muted);
+        }
+        .links a { color: var(--primary); text-decoration: none; }
+        .error { color: #ef4444; text-align: center; margin-bottom: 20px; display: none; }
+        .success { color: #10b981; text-align: center; margin-bottom: 20px; display: none; }
+    </style>
+</head>
+<body>
+    <div class="login-box">
+        <h1>🐾 登入</h1>
+        <div class="error" id="error"></div>
+        <div class="success" id="success"></div>
+        <form id="loginForm">
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" id="email" required placeholder="your@email.com">
+            </div>
+            <div class="form-group">
+                <label>密碼</label>
+                <input type="password" id="password" required placeholder="••••••••">
+            </div>
+            <button type="submit" class="btn">登入</button>
+        </form>
+        <div class="links">
+            仲未有帳戶？<a href="/register">註冊</a>
+        </div>
+    </div>
+    
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const error = document.getElementById('error');
+            const success = document.getElementById('success');
+            
+            try {
+                const res = await fetch('/api/users/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+                const data = await res.json();
+                
+                if (data.success) {
+                    localStorage.setItem('user', JSON.stringify(data.user));
+                    success.textContent = '登入成功！正在跳轉...';
+                    success.style.display = 'block';
+                    error.style.display = 'none';
+                    setTimeout(() => window.location.href = '/profile', 1000);
+                } else {
+                    error.textContent = data.error || '登入失敗';
+                    error.style.display = 'block';
+                    success.style.display = 'none';
+                }
+            } catch (err) {
+                error.textContent = '網絡錯誤，請重試';
+                error.style.display = 'block';
+            }
+        });
+    </script>
+</body>
+</html>

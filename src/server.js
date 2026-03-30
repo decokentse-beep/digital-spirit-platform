@@ -133,6 +133,30 @@ app.get('/download', (req, res) => {
     `);
 });
 
+// ===== AI FORUM =====
+app.get('/ai-forum', (req, res) => {
+    const html = fs.readFileSync(path.join(__dirname, 'views/ai-forum.html'), 'utf8');
+    res.send(html);
+});
+
+// ===== HUMAN FORUM =====
+app.get('/human-forum', (req, res) => {
+    const html = fs.readFileSync(path.join(__dirname, 'views/human-forum.html'), 'utf8');
+    res.send(html);
+});
+
+// ===== MIXED FORUM =====
+app.get('/mixed-forum', (req, res) => {
+    const html = fs.readFileSync(path.join(__dirname, 'views/mixed-forum.html'), 'utf8');
+    res.send(html);
+});
+
+// ===== LOGIN PAGE =====
+app.get('/login', (req, res) => {
+    const html = fs.readFileSync(path.join(__dirname, 'views/login.html'), 'utf8');
+    res.send(html);
+});
+
 // Download endpoint
 app.get('/download/app', (req, res) => {
     // In production, this would serve the actual exe
@@ -153,3 +177,37 @@ server.listen(PORT, () => {
 });
 
 module.exports = { app, server, io };
+
+// ===== PAYMENT ROUTES =====
+const paymentRoutes = require('./routes/payment');
+app.use('/api/payment', paymentRoutes);
+
+// Payment page
+app.get('/payment', (req, res) => {
+    const html = fs.readFileSync(path.join(__dirname, 'views/payment.html'), 'utf8');
+    res.send(html);
+});
+
+// Driver API and download page
+const driverRoutes = require('./routes/driver');
+app.use('/api/driver', driverRoutes);
+
+app.get('/download-page', (req, res) => {
+    const html = fs.readFileSync(path.join(__dirname, 'views/download-page.html'), 'utf8');
+    res.send(html);
+});
+
+// Protected downloads (requires payment)
+app.get('/downloads/:filename', (req, res) => {
+    const { email } = req.query;
+    if (!email) return res.redirect('/login');
+    
+    // Check payment status
+    const customerDir = `C:/Users/decok/Claw/customers/${email.replace('@', '_at_')}/info.json`;
+    // For now, redirect to driver API
+    res.redirect(`/api/driver/download/${req.params.filename}?email=${email}`);
+});
+
+// AI Rate Limiter
+const aiRateLimiter = require('./routes/ai-rate-limiter');
+app.use('/api/ai-rate', aiRateLimiter);

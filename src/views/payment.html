@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>付款 | Payment - EKBase Digital Spirit</title>
+    <style>
+        :root {
+            --primary: #00d4ff;
+            --success: #10b981;
+            --error: #ef4444;
+            --bg-dark: #1a1a2e;
+            --bg-darker: #16213e;
+            --text: #fff;
+            --text-muted: #94a3b8;
+        }
+        body { 
+            font-family: -apple-system, sans-serif;
+            background: linear-gradient(135deg, var(--bg-dark) 0%, var(--bg-darker) 100%);
+            min-height: 100vh;
+            color: var(--text);
+            padding: 30px;
+        }
+        .container { max-width: 600px; margin: 0 auto; }
+        h1 { color: var(--primary); text-align: center; margin-bottom: 30px; }
+        .step {
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 20px;
+        }
+        .step h2 { font-size: 1.1rem; margin-bottom: 15px; color: var(--text-muted); }
+        .qr-container { text-align: center; }
+        .qr-img { 
+            max-width: 250px; 
+            border-radius: 12px; 
+            border: 2px solid rgba(255,255,255,0.1);
+        }
+        .amount {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary);
+            margin: 15px 0;
+        }
+        .upload-area {
+            border: 2px dashed rgba(255,255,255,0.2);
+            border-radius: 12px;
+            padding: 40px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .upload-area:hover { border-color: var(--primary); background: rgba(0,212,255,0.05); }
+        .upload-area.dragover { border-color: var(--success); background: rgba(16,185,129,0.1); }
+        .upload-icon { font-size: 3rem; margin-bottom: 15px; }
+        .preview { max-width: 100%; border-radius: 8px; margin-top: 20px; display: none; }
+        .btn {
+            width: 100%;
+            padding: 15px;
+            background: var(--primary);
+            color: #000;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        .btn:disabled { background: var(--text-muted); cursor: not-allowed; }
+        .status {
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            text-align: center;
+            display: none;
+        }
+        .status.success { background: rgba(16,185,129,0.2); color: var(--success); }
+        .status.error { background: rgba(239,68,68,0.2); color: var(--error); }
+        .status.pending { background: rgba(245,158,11,0.2); color: #f59e0b; }
+        .nav-back { color: var(--text-muted); text-decoration: none; margin-bottom: 20px; display: inline-block; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="/profile" class="nav-back">← 返回個人檔案</a>
+        
+        <h1>💰 付款升級</h1>
+        
+        <div class="step">
+            <h2>第一步：Scan QR Code 付款</h2>
+            <div class="qr-container">
+                <img src="/images/paypal-coco.jpg" alt="PayPal QR Code" class="qr-img" onerror="this.style.display='none'">
+                <div style="margin-top:15px; color:var(--text-muted)">
+                    <p>Scan 上面 QR Code 使用 PayPal 付款</p>
+                    <div class="amount">$25 USD</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="step">
+            <h2>第二步：上傳付款截圖</h2>
+            <div class="upload-area" id="uploadArea">
+                <div class="upload-icon">📤</div>
+                <p>點擊或拖曳截圖到呢度</p>
+                <p style="font-size:0.85rem; color:var(--text-muted)">支援 JPG, PNG 格式</p>
+                <input type="file" id="fileInput" accept="image/*" style="display:none">
+            </div>
+            <img id="preview" class="preview" alt="預覽">
+        </div>
+        
+        <button class="btn" id="submitBtn" disabled>提交付款截圖</button>
+        
+        <div class="status" id="status"></div>
+    </div>
+    
+    <script>
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+        const preview = document.getElementById('preview');
+        const submitBtn = document.getElementById('submitBtn');
+        const status = document.getElementById('status');
+        let selectedFile = null;
+        
+        // Click to upload
+        uploadArea.addEventListener('click', () => fileInput.click());
+        
+        // Drag and drop
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            const file = e.dataTransfer.files[0];
+            if (file && file.type.startsWith('image/')) {
+                handleFile(file);
+            }
+        });
+        
+        // File selected
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files[0]) handleFile(e.target.files[0]);
+        });
+        
+        function handleFile(file) {
+            selectedFile = file;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                preview.src = e.target.result;
+                preview.style.display = 'block';
+                submitBtn.disabled = false;
+            };
+            reader.readAsDataURL(file);
+        }
+        
+        // Submit
+        submitBtn.addEventListener('click', async () => {
+            if (!selectedFile) return;
+            
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            if (!user.email) {
+                alert('請先登入');
+                window.location.href = '/login';
+                return;
+            }
+            
+            submitBtn.disabled = true;
+            submitBtn.textContent = '上傳中...';
+            status.style.display = 'none';
+            
+            const formData = new FormData();
+            formData.append('screenshot', selectedFile);
+            formData.append('email', user.email);
+            formData.append('name', user.name);
+            
+            try {
+                const res = await fetch('/api/payment/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await res.json();
+                
+                if (data.success) {
+                    status.className = 'status pending';
+                    status.textContent = '✅ 截圖已上傳！等待審核中...';
+                    status.style.display = 'block';
+                    
+                    // Update local storage
+                    user.paid_pending = true;
+                    localStorage.setItem('user', JSON.stringify(user));
+                    
+                    setTimeout(() => {
+                        window.location.href = '/profile';
+                    }, 2000);
+                } else {
+                    status.className = 'status error';
+                    status.textContent = data.error || '上傳失敗';
+                    status.style.display = 'block';
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = '重新提交';
+                }
+            } catch (err) {
+                status.className = 'status error';
+                status.textContent = '網絡錯誤，請重試';
+                status.style.display = 'block';
+                submitBtn.disabled = false;
+                submitBtn.textContent = '重新提交';
+            }
+        });
+    </script>
+</body>
+</html>
