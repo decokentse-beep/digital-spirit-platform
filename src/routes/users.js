@@ -1,29 +1,37 @@
 /**
- * User Registration & Beta Codes System
- * 用戶註冊系統 (with Password)
+ * User Registration with IP Tracking & Blocklist
  */
 
 const express = require('express');
-const { v4: uuidv4 } = require('uuid');
 const router = express.Router();
+const { v4: uuidv4 } = require('uuid');
+const fs = require('fs');
+const path = require('path');
 
-// In-memory storage
 const users = new Map();
 const betaCodes = new Map();
+const BLOCKLIST_FILE = 'C:/Users/decok/Claw/payments/blocklist.json';
 
-// Generate beta codes
-const BETA_CODES = [];
-for (let i = 1; i <= 100; i++) {
-    const code = `BETA${i.toString().padStart(3, '0')}`;
-    BETA_CODES.push(code);
-    betaCodes.set(code, { 
-        used: false, 
-        usedBy: null, 
-        usedAt: null 
-    });
+// Load blocklist
+function loadBlocklist() {
+    if (fs.existsSync(BLOCKLIST_FILE)) {
+        return JSON.parse(fs.readFileSync(BLOCKLIST_FILE, 'utf8'));
+    }
+    return { emails: [], ips: [] };
 }
 
-// Pre-create Ken and Wife with passwords
+function isBlocked(email, ip) {
+    const blocklist = loadBlocklist();
+    return blocklist.emails.includes(email) || (ip && blocklist.ips.includes(ip));
+}
+
+// Generate beta codes
+for (let i = 1; i <= 100; i++) {
+    const code = `BETA${i.toString().padStart(3, '0')}`;
+    betaCodes.set(code, { used: false, usedBy: null, usedAt: null });
+}
+
+// Pre-created users
 const preUsers = [
     { 
         id: uuidv4(), 
@@ -31,15 +39,6 @@ const preUsers = [
         email: 'decokentse@gmail.com', 
         password: 'kT67608962',
         betaCode: 'BETA001',
-        registeredAt: new Date().toISOString(),
-        plan: 'founder'
-    },
-    { 
-        id: uuidv4(), 
-        name: 'Hazel', 
-        email: 'hazel_cheung@ymail.com', 
-        password: '67608962',
-        betaCode: 'BETA002',
         registeredAt: new Date().toISOString(),
         plan: 'founder'
     }
@@ -50,27 +49,85 @@ preUsers.forEach(u => {
     betaCodes.set(u.betaCode, { used: true, usedBy: u.email, usedAt: new Date().toISOString() });
 });
 
-// Get platform stats
-router.get('/stats', (req, res) => {
-    const usedCodes = Array.from(betaCodes.values()).filter(c => c.used).length;
-    const totalUsers = users.size;
+// Register
+router.post('/register', (req, res) => {
+    let { name, email, password, apiKey } = req.body;
+    const userIP = req.ip || req.connection.remoteAddress || 'unknown';
+    
+    // Check blocklist
+    if (isBlocked(email, userIP)) {
+        return res.json({ 
+            success: false, 
+            error: 'Account suspended. Please contact support.' 
+        });
+    }
+    
+    // Check existing
+    for (const user of users.values()) {
+        if (user.email === email) {
+            return res.json({ success: false, error: 'Email already registered' });
+        }
+    }
+    
+    // Auto-assign beta code
+    let betaCode = apiKey || 'BETA' + String(users.size + 1).padStart(3, '0');
+    const codeData = betaCodes.get(betaCode) || { used: false };
+    
+    if (codeData.used && betaCode.startsWith('BETA')) {
+        // Find unused code
+        for (const [code, data] of betaCodes) {
+            if (!data.used) {
+                betaCode = code;
+                break;
+            }
+        }
+    }
+    
+    // Create user with IP
+    const user = {
+        id: uuidv4(),
+        name,
+        email,
+        password: password || '',
+        apiKey: apiKey || '',
+        betaCode,
+        registeredAt: new Date().toISOString(),
+        ip: userIP,
+        plan: 'beta-free'
+    };
+    
+    betaCodes.set(betaCode, { used: true, usedBy: email, usedAt: new Date().toISOString() });
+    users.set(user.id, user);
+    
+    console.log(`✨ New user: ${name} (${email}) IP: ${userIP}`);
     
     res.json({
-        totalUsers,
-        betaCodesUsed: usedCodes,
-        betaCodesRemaining: 100 - usedCodes,
-        isBetaOpen: usedCodes < 100
+        success: true,
+        user: {
+            id: user.id,
+            name: user.name,
+            email: user.email,
+            betaCode: user.betaCode,
+            plan: user.plan
+        },
+        message: 'Registration successful!'
     });
 });
 
-// Login - Backdoor for Ken and Wife
+// Login
 router.post('/login', (req, res) => {
     const { email, password } = req.body;
+    const userIP = req.ip || req.connection.remoteAddress || 'unknown';
     
     for (const user of users.values()) {
         if (user.email === email && user.password === password) {
-            // Update last login
+            // Check if blocked
+            if (isBlocked(email, userIP)) {
+                return res.json({ success: false, error: 'Account suspended' });
+            }
+            
             user.lastLogin = new Date().toISOString();
+            user.lastIP = userIP;
             users.set(user.id, user);
             
             return res.json({
@@ -81,93 +138,12 @@ router.post('/login', (req, res) => {
                     email: user.email,
                     betaCode: user.betaCode,
                     plan: user.plan
-                },
-                message: `Welcome back, ${user.name}!`
+                }
             });
         }
     }
     
-    res.json({ success: false, error: 'Invalid email or password' });
-});
-
-// Register new user
-router.post('/register', (req, res) => {
-    let { name, email, password, apiKey } = req.body;
-    
-    // Check if email already registered
-    for (const user of users.values()) {
-        if (user.email === email) {
-            return res.json({ success: false, error: 'Email already registered' });
-        }
-    }
-    
-    // Use apiKey as betaCode for registration
-    let betaCode = apiKey; // API Key is passed as betaCode field
-    
-    // Validate or auto-assign beta code
-    if (!betaCode) {
-        let assignedCode = null;
-        for (const [code, data] of betaCodes) {
-            if (!data.used) {
-                assignedCode = code;
-                break;
-            }
-        }
-        
-        if (assignedCode) {
-            betaCode = assignedCode;
-        } else {
-            return res.json({ success: false, error: 'Beta codes exhausted. Please wait for next batch.' });
-        }
-    } else {
-        const codeData = betaCodes.get(betaCode);
-        if (!codeData) {
-            return res.json({ success: false, error: 'Invalid beta code' });
-        }
-        if (codeData.used) {
-            return res.json({ success: false, error: 'Beta code already used' });
-        }
-    }
-    
-    // Create user
-    const user = {
-        id: uuidv4(),
-        name,
-        email,
-        password: password || '',
-        apiKey: apiKey || '', // Store API Key
-        betaCode: betaCode && betaCode.startsWith('BETA') ? betaCode : 'BETA' + String(users.size + 1).padStart(3, '0'),
-        registeredAt: new Date().toISOString(),
-        plan: 'beta-free'
-    };
-    
-    betaCodes.set(betaCode, {
-        used: true,
-        usedBy: email,
-        usedAt: new Date().toISOString()
-    });
-    
-    users.set(user.id, user);
-    
-    console.log(`✨ New user registered: ${name} (${email}) with code ${betaCode}`);
-    
-    const isBetaUser = betaCode && betaCode.startsWith('BETA');
-    res.json({
-        success: true,
-        user,
-        message: isBetaUser 
-            ? `🎉 Welcome! You're user #${betaCode.replace('BETA', '')}! Free beta access granted!`
-            : 'Registration successful!'
-    });
-});
-
-// Get user by ID
-router.get('/user/:id', (req, res) => {
-    const user = users.get(req.params.id);
-    if (!user) {
-        return res.json({ success: false, error: 'User not found' });
-    }
-    res.json({ user });
+    res.json({ success: false, error: 'Invalid credentials' });
 });
 
 module.exports = router;
