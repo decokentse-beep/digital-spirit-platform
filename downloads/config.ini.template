@@ -1,0 +1,9 @@
+[settings]
+# Get your bot token from @BotFather
+TELEGRAM_BOT_TOKEN = your_bot_token_here
+
+# Comma-separated user IDs who can use this bot
+ALLOWED_USERS = 6054796337
+
+# Driver URL (default for local testing)
+DRIVER_URL = http://localhost:9100/chat

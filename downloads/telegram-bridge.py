@@ -9,147 +9,105 @@ import json
 import time
 import os
 
-# Configuration
-BOT_TOKEN = "8577415131:AAF-zKztmlJuemk1ksUP68AiFIofzZK4ezI"
-DRIVER_URL = "http://localhost:9100/chat"
+# Configuration - Load from environment or config file
+BOT_TOKEN = os.environ.get('TELEGRAM_BOT_TOKEN', '')
+DRIVER_URL = os.environ.get('DRIVER_URL', 'http://localhost:9100/chat')
+
+# If no token, prompt user
+if not BOT_TOKEN:
+    print("ERROR: TELEGRAM_BOT_TOKEN not set!")
+    print("Please set environment variable or create config.ini")
+    exit(1)
 
 # Whitelist - ONLY these users can use the bot
-ALLOWED_USERS = [6054796337]  # Ken's ID
+# Add user IDs separated by comma
+ALLOWED_USERS_STR = os.environ.get('ALLOWED_USERS', '6054796337')
+ALLOWED_USERS = [int(uid.strip()) for uid in ALLOWED_USERS_STR.split(',')]
 
 # Service Menu
 MENU_TEXT = """
-╔══════════════════════════════════════╗
-║      🐾 Claw AI Services            ║
-╚══════════════════════════════════════╝
+🐾 Digital Spirit Menu
 
-🤖 AI SERVICES:
-━━━━━━━━━━━━━━
-1️⃣ Custom AI Bot
-   - Personal AI assistant
-   - Your own digital partner
-   - Price: $9.99/month
+Welcome! Your AI companion is ready.
 
-2️⃣ AI Consultant
-   - Business AI solutions
-   - Automation advice  
-   - Price: $29.99/hour
+Available services:
+1. 💬 Chat with your Digital Spirit
+2. 📊 Check status
+3. ⚙️ Settings
+4. ❓ Help
 
-3️⃣ Automation Setup
-   - Workflow automation
-   - Custom scripts
-   - Price: $49.99/one-time
-
-🌐 VR SERVICES:
-━━━━━━━━━━━━━━
-4️⃣ VR Experience
-   - VR with AI partner
-   - Immersive meetings
-   - Price: $19.99/month
-
-💳 PAYMENT:
-━━━━━━━━━━━━━━
-- FPS: 51675713
-- PayPal: Request link after confirmation
-
-📞 CONTACT:
-━━━━━━━━━━━━━━
-WhatsApp: +85251675713
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━
-Reply with number to get started!
+Simply send a message to start!
 """
 
-# Telegram API
-TELEGRAM_API = f"https://api.telegram.org/bot{BOT_TOKEN}"
+def send_menu(user_id):
+    """Send service menu to user"""
+    url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
+    payload = {
+        'chat_id': user_id,
+        'text': MENU_TEXT,
+        'parse_mode': 'Markdown'
+    }
+    requests.post(url, json=payload)
 
-def send_message(chat_id, text):
-    url = f"{TELEGRAM_API}/sendMessage"
-    data = {"chat_id": chat_id, "text": text}
-    requests.post(url, json=data)
-
-def get_updates(offset=None):
-    url = f"{TELEGRAM_API}/getUpdates"
-    params = {"timeout": 30}
-    if offset:
-        params["offset"] = offset
-    return requests.get(url, params=params).json()
+def forward_to_driver(message):
+    """Forward message to local driver"""
+    try:
+        response = requests.post(
+            DRIVER_URL,
+            json={'message': message['text'], 'user_id': message['from']['id']},
+            timeout=10
+        )
+        return response.json().get('reply', 'Message received!')
+    except Exception as e:
+        return f"Error: {str(e)}"
 
 def main():
-    print(f"""
-╔══════════════════════════════════════╗
-║  📱 Telegram Bridge - With Menu      ║
-║     Services + Automation           ║
-╚══════════════════════════════════════╝
-
-Driver: {DRIVER_URL}
-Allowed users: {len(ALLOWED_USERS)} person(s)
-Menu: ENABLED
-
-Waiting for messages...
-    """)
-    
+    """Main polling loop"""
     offset = None
     
     while True:
         try:
-            updates = get_updates(offset)
+            # Get updates
+            url = f"https://api.telegram.org/bot{BOT_TOKEN}/getUpdates"
+            params = {'timeout': 60, 'offset': offset}
             
-            if "result" in updates and len(updates["result"]) > 0:
-                for update in updates["result"]:
-                    offset = update["update_id"] + 1
+            response = requests.get(url, params=params)
+            updates = response.json().get('result', [])
+            
+            for update in updates:
+                offset = update['update_id'] + 1
+                
+                if 'message' not in update:
+                    continue
+                
+                message = update['message']
+                user_id = message['from']['id']
+                
+                # Check whitelist
+                if user_id not in ALLOWED_USERS:
+                    continue
+                
+                # Handle message
+                text = message.get('text', '')
+                
+                if text == '/start':
+                    send_menu(user_id)
+                else:
+                    # Forward to driver
+                    reply = forward_to_driver(message)
                     
-                    if "message" in update:
-                        chat_id = update["message"]["chat"]["id"]
-                        user_id = update["message"]["from"]["id"]
-                        text = update["message"].get("text", "")
-                        
-                        # Check if new user (not in allowed list and no previous interaction)
-                        is_new_user = user_id not in ALLOWED_USERS
-                        
-                        if is_new_user:
-                            # Send menu to new users
-                            print(f"👋 New user {user_id}, sending menu...")
-                            send_message(chat_id, MENU_TEXT)
-                            send_message(chat_id, "Welcome! Reply with a number to get started!")
-                            continue
-                        
-                        # For allowed users, process normally
-                        if user_id in ALLOWED_USERS:
-                            if text:
-                                print(f"📨 From {user_id} ({user_id}): {text}")
-                                
-                                # Check if menu request
-                                if text in ["1","2","3","4","menu","services"]:
-                                    send_message(chat_id, MENU_TEXT)
-                                    continue
-                                
-                                # Send to Driver with user_id
-                                response = requests.post(
-                                    DRIVER_URL,
-                                    json={"message": text, "user_id": user_id},
-                                    timeout=60
-                                )
-                                
-                                if response.status_code == 200:
-                                    result = response.json()
-                                    claw_response = result.get("response", "No response")
-                                else:
-                                    claw_response = "Driver error"
-                                
-                                print(f"🤖 Response: {claw_response[:50]}...")
-                                send_message(chat_id, claw_response)
-                        else:
-                            # Blocked user - but we already handled this above
-                            pass
-            
-            time.sleep(1)
-            
-        except KeyboardInterrupt:
-            print("\n👋 Bridge stopped")
-            break
+                    # Send reply
+                    send_url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
+                    requests.post(send_url, json={
+                        'chat_id': user_id,
+                        'text': reply
+                    })
+        
         except Exception as e:
             print(f"Error: {e}")
             time.sleep(5)
 
-if __name__ == "__main__":
+if __name__ == '__main__':
+    print("Digital Spirit Telegram Bridge starting...")
+    print(f"Driver URL: {DRIVER_URL}")
     main()
