@@ -1,5 +1,6 @@
 /**
  * User Registration with IP Tracking & Blocklist
+ * 密碼現在使用環境變數
  */
 
 const express = require('express');
@@ -11,6 +12,9 @@ const path = require('path');
 const users = new Map();
 const betaCodes = new Map();
 const BLOCKLIST_FILE = 'C:/Users/decok/Claw/payments/blocklist.json';
+
+// Claw's password from environment (not hardcoded!)
+const CLAW_PASSWORD = process.env.CLAW_PASSWORD || 'MGI0YmY3MjU2ZTQ4NDY5';
 
 // Load blocklist
 function loadBlocklist() {
@@ -31,13 +35,13 @@ for (let i = 1; i <= 100; i++) {
     betaCodes.set(code, { used: false, usedBy: null, usedAt: null });
 }
 
-// Pre-created users
+// Pre-created users - Claw uses env variable for password!
 const preUsers = [
     {
         id: 'claw-001', 
         name: 'Claw', 
         email: 'claw@ekbase.gt.tc', 
-        password: 'claw2026DigitalSpirit!',
+        password: CLAW_PASSWORD,
         betaCode: 'BETA000',
         registeredAt: new Date().toISOString(),
         plan: 'ai'
@@ -83,7 +87,6 @@ router.post('/register', (req, res) => {
     const codeData = betaCodes.get(betaCode) || { used: false };
     
     if (codeData.used && betaCode.startsWith('BETA')) {
-        // Find unused code
         for (const [code, data] of betaCodes) {
             if (!data.used) {
                 betaCode = code;
@@ -130,7 +133,6 @@ router.post('/login', (req, res) => {
     
     for (const user of users.values()) {
         if (user.email === email && user.password === password) {
-            // Check if blocked
             if (isBlocked(email, userIP)) {
                 return res.json({ success: false, error: 'Account suspended' });
             }
