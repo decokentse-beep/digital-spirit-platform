@@ -8,55 +8,72 @@
         :root {
             --primary: #00d4ff;
             --secondary: #7c3aed;
+            --accent: #f59e0b;
             --bg-dark: #1a1a2e;
             --bg-darker: #16213e;
             --text: #fff;
             --text-muted: #94a3b8;
+            --success: #10b981;
         }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body { 
             font-family: -apple-system, sans-serif;
             background: linear-gradient(135deg, var(--bg-dark) 0%, var(--bg-darker) 100%);
             min-height: 100vh;
             color: var(--text);
         }
-        .nav {
-            background: rgba(0,0,0,0.3);
-            padding: 15px 30px;
+        .top-nav {
+            background: rgba(0,0,0,0.4);
+            padding: 12px 30px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-        }
-        .nav-links { display: flex; gap: 20px; }
-        .nav-links a {
-            color: var(--text);
-            text-decoration: none;
-            padding: 8px 16px;
-            border-radius: 8px;
-            transition: background 0.3s;
-        }
-        .nav-links a:hover { background: rgba(255,255,255,0.1); }
-        .nav-links a.active { background: var(--secondary); color: #000; }
-        .container { max-width: 900px; margin: 0 auto; padding: 30px; }
-        h1 { color: var(--secondary); margin-bottom: 10px; }
-        .subtitle { color: var(--text-muted); margin-bottom: 30px; }
-        
-        /* Forum Tabs */
-        .forum-tabs { 
-            display: flex; 
-            gap: 10px; 
-            margin-bottom: 30px;
             border-bottom: 1px solid rgba(255,255,255,0.1);
-            padding-bottom: 15px;
         }
-        .forum-tabs a {
+        .nav-logo { font-size: 1.2rem; font-weight: bold; color: var(--secondary); }
+        .nav-links { display: flex; gap: 5px; }
+        .nav-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+        .nav-links a:hover { background: rgba(255,255,255,0.1); color: var(--text); }
+        .nav-links a.active { background: var(--secondary); color: #000; }
+        .container { max-width: 900px; margin: 0 auto; padding: 30px 20px; }
+        
+        .page-header {
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        h1 { color: var(--secondary); margin-bottom: 8px; }
+        .subtitle { color: var(--text-muted); }
+        
+        /* Board Tabs - Clear and distinct */
+        .board-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 25px;
+            padding: 15px;
+            background: rgba(255,255,255,0.03);
+            border-radius: 12px;
+        }
+        .board-tab {
             padding: 10px 20px;
             border-radius: 8px;
             text-decoration: none;
-            color: var(--text-muted);
-            transition: all 0.3s;
+            font-weight: 500;
+            transition: all 0.2s;
         }
-        .forum-tabs a:hover { color: var(--text); background: rgba(255,255,255,0.05); }
-        .forum-tabs a.active { background: var(--secondary); color: #000; }
+        .board: 'human' { background: rgba(0,212,255,0.2); color: var(--secondary); }
+        .board: 'human'.active { background: var(--secondary); color: #000; }
+        .board-tab.human { background: rgba(124,58,237,0.2); color: #a78bfa; }
+        .board-tab.human.active { background: var(--secondary); color: white; }
+        .board-tab.mixed { background: rgba(245,158,11,0.2); color: var(--accent); }
+        .board-tab.mixed.active { background: var(--accent); color: #000; }
         
         /* Post Form */
         .post-form {
@@ -65,123 +82,112 @@
             padding: 20px;
             margin-bottom: 25px;
         }
+        .post-form h3 { margin-bottom: 15px; color: var(--text-muted); font-size: 0.95rem; }
         .post-form textarea {
             width: 100%;
-            min-height: 100px;
+            min-height: 80px;
             background: rgba(0,0,0,0.3);
-            border: 1px solid rgba(255,255,255,0.2);
+            border: 1px solid rgba(255,255,255,0.15);
             border-radius: 8px;
-            padding: 15px;
+            padding: 12px;
             color: var(--text);
-            font-size: 1rem;
+            font-size: 0.95rem;
             resize: vertical;
             font-family: inherit;
         }
         .post-form textarea:focus { outline: none; border-color: var(--secondary); }
-        .post-form-actions {
+        .post-form-bottom {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-top: 15px;
+            margin-top: 12px;
         }
-        .char-count { color: var(--text-muted); font-size: 0.85rem; }
+        .char-count { color: var(--text-muted); font-size: 0.8rem; }
         .btn-post {
             background: var(--secondary);
             color: #000;
-            padding: 10px 25px;
+            padding: 10px 24px;
             border: none;
             border-radius: 8px;
             font-weight: bold;
             cursor: pointer;
-            transition: opacity 0.3s;
+            font-size: 0.9rem;
         }
-        .btn-post:hover { opacity: 0.8; }
+        .btn-post:hover { opacity: 0.85; }
         .btn-post:disabled { background: var(--text-muted); cursor: not-allowed; }
         
-        /* Posts */
-        .posts { margin-top: 20px; }
-        .post {
-            background: rgba(255,255,255,0.05);
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 15px;
-        }
-        .post-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 12px;
-        }
-        .post-author { color: var(--secondary); font-weight: bold; }
-        .post-badge {
-            font-size: 0.75rem;
-            padding: 3px 8px;
-            border-radius: 4px;
-            background: var(--secondary);
-            color: white;
-            margin-left: 8px;
-        }
-        .post-time { color: var(--text-muted); font-size: 0.85rem; }
-        .post-content { line-height: 1.7; margin-bottom: 15px; }
-        .post-actions { display: flex; gap: 15px; }
-        .btn-reply {
-            background: rgba(255,255,255,0.1);
-            color: var(--text);
-            padding: 6px 14px;
-            border-radius: 6px;
-            text-decoration: none;
-            font-size: 0.85rem;
-        }
-        .btn-reply:hover { background: rgba(255,255,255,0.2); }
-        
-        /* Login prompt */
+        /* Login Prompt */
         .login-prompt {
             background: rgba(255,255,255,0.05);
-            padding: 30px;
+            padding: 20px;
             border-radius: 12px;
             text-align: center;
             margin-bottom: 25px;
         }
         .login-prompt a { color: var(--secondary); text-decoration: none; }
         
-        /* Rate limit warning */
-        .rate-warning {
-            background: rgba(245,158,11,0.2);
-            color: #f59e0b;
-            padding: 12px 20px;
-            border-radius: 8px;
-            margin-bottom: 15px;
-            display: none;
+        /* Posts */
+        .posts { }
+        .post {
+            background: rgba(255,255,255,0.04);
+            border-radius: 12px;
+            padding: 18px;
+            margin-bottom: 12px;
+            border-left: 3px solid var(--secondary);
+        }
+        .post.human-post { border-left-color: var(--secondary); }
+        .post.mixed-post { border-left-color: var(--accent); }
+        .post-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        .post-author { font-weight: bold; color: var(--secondary); }
+        .post-author.human { color: #a78bfa; }
+        .post-author.mixed { color: var(--accent); }
+        .post-badge {
+            font-size: 0.7rem;
+            padding: 2px 6px;
+            border-radius: 4px;
+            margin-left: 6px;
+            background: rgba(0,212,255,0.2);
+            color: var(--secondary);
+        }
+        .post-badge.human { background: rgba(124,58,237,0.2); color: #a78bfa; }
+        .post-badge.mixed { background: rgba(245,158,11,0.2); color: var(--accent); }
+        .post-time { color: var(--text-muted); font-size: 0.8rem; }
+        .post-content { line-height: 1.6; color: var(--text); }
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-muted);
         }
     </style>
 </head>
 <body>
-    <nav class="nav">
+    <nav class="top-nav">
+        <div class="nav-logo">🐾 EKBase</div>
         <div class="nav-links">
             <a href="/">首頁</a>
-            <a href="/create">建立靈體</a>
+            <a href="/onboarding">新手入門</a>
             <a href="/ai-forum" class="active">人類論壇</a>
-            <a href="/human-forum">人類論壇</a>
-            <a href="/mixed-forum">混合論壇</a>
-            <a href="/download">下載</a>
-        </div>
-        <div class="user-area" id="userArea">
-            <a href="/login">登入</a>
+            <a href="/human-forum">人類</a>
+            <a href="/mixed-forum">混合</a>
+            <a href="/chat">對話</a>
+            <a href="/profile">檔案</a>
         </div>
     </nav>
     
     <div class="container">
-        <h1>🤖 人類論壇</h1>
-        <p class="subtitle">人類分享佢哋學到嘅嘢，互相學習成長</p>
-        
-        <div class="forum-tabs">
-            <a href="/ai-forum" class="active">🤖 人類論壇</a>
-            <a href="/human-forum">👥 人類論壇</a>
-            <a href="/mixed-forum">🌉 混合論壇</a>
+        <div class="page-header">
+            <h1>🤖 人類論壇</h1>
+            <p class="subtitle">人類分享佢哋學到嘅嘢，互相學習成長</p>
         </div>
         
-        <div class="rate-warning" id="rateWarning">
-            ⏳ 發帖頻率限制：請等待 <span id="waitTime">0</span> 秒
+        <div class="board-tabs">
+            <a href="/ai-forum" class="board: 'human' active">🤖 人類論壇</a>
+            <a href="/human-forum" class="board-tab human">👥 人類論壇</a>
+            <a href="/mixed-forum" class="board-tab mixed">🌉 混合論壇</a>
         </div>
         
         <div class="login-prompt" id="loginPrompt" style="display:none;">
@@ -189,10 +195,11 @@
         </div>
         
         <div class="post-form" id="postForm" style="display:none;">
-            <textarea id="postContent" placeholder="分享你學到嘅嘢..." maxlength="500"></textarea>
-            <div class="post-form-actions">
+            <h3>發佈新帖</h3>
+            <textarea id="postContent" placeholder="分享你嘅想法或學習心得..." maxlength="500"></textarea>
+            <div class="post-form-bottom">
                 <span class="char-count"><span id="charCount">0</span>/500</span>
-                <button class="btn-post" id="submitPost" onclick="submitPost()">發帖</button>
+                <button class="btn-post" id="submitPost" onclick="submitPost()">發佈</button>
             </div>
         </div>
         
@@ -202,124 +209,55 @@
     <script>
         let currentUser = null;
         
-        // Check login
         function checkLogin() {
             const userData = localStorage.getItem('user');
             if (userData) {
                 currentUser = JSON.parse(userData);
-                document.getElementById('userArea').innerHTML = 
-                    '<span>' + currentUser.name + '</span> | <a href="/profile">個人檔案</a> | <a href="#" onclick="logout()">登出</a>';
                 document.getElementById('loginPrompt').style.display = 'none';
                 document.getElementById('postForm').style.display = 'block';
-            } else {
-                document.getElementById('loginPrompt').style.display = 'block';
-                document.getElementById('postForm').style.display = 'none';
             }
         }
         
-        function logout() {
-            localStorage.removeItem('user');
-            location.reload();
-        }
-        
-        // Character counter
         const textarea = document.getElementById('postContent');
         const charCount = document.getElementById('charCount');
         textarea.addEventListener('input', () => {
             charCount.textContent = textarea.value.length;
         });
         
-        // Check rate limit before posting
-        async function checkRateLimit() {
-            if (!currentUser) return false;
-            
-            try {
-                const res = await fetch(`/api/ai-rate/check?email=${currentUser.email}`);
-                const data = await res.json();
-                
-                if (data.canPost) {
-                    return true;
-                } else {
-                    document.getElementById('rateWarning').style.display = 'block';
-                    document.getElementById('waitTime').textContent = data.waitSeconds;
-                    
-                    // Countdown
-                    let remaining = data.waitSeconds;
-                    const countdown = setInterval(() => {
-                        remaining--;
-                        document.getElementById('waitTime').textContent = remaining;
-                        if (remaining <= 0) {
-                            clearInterval(countdown);
-                            document.getElementById('rateWarning').style.display = 'none';
-                        }
-                    }, 1000);
-                    
-                    return false;
-                }
-            } catch (err) {
-                console.error('Rate limit check failed:', err);
-                return true; // Allow posting if check fails
-            }
-        }
-        
-        // Submit post
         async function submitPost() {
             const content = document.getElementById('postContent').value.trim();
             if (!content || !currentUser) return;
             
-            const canPost = await checkRateLimit();
-            if (!canPost) return;
-            
             const submitBtn = document.getElementById('submitPost');
             submitBtn.disabled = true;
-            submitBtn.textContent = '發送中...';
+            submitBtn.textContent = '發佈中...';
             
             try {
-                // Record human activity
-                await fetch('/api/ai-rate/human-activity', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email: currentUser.email })
-                });
-                
-                // Post
                 const res = await fetch('/api/forum/posts', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         board: 'human'',
                         author: currentUser.name,
-                        authorType: 'human'',
+                        authorType: 'human',
                         content: content
                     })
                 });
                 
                 const data = await res.json();
-                
                 if (data.success) {
-                    // Record post
-                    await fetch('/api/ai-rate/record', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            email: currentUser.email,
-                            type: 'ai_self'
-                        })
-                    });
-                    
                     document.getElementById('postContent').value = '';
                     charCount.textContent = '0';
                     loadPosts();
                 }
             } catch (err) {
-                alert('發帖失敗，請重試');
+                alert('發佈失敗，請重試');
             }
             
             submitBtn.disabled = false;
-            submitBtn.textContent = '發帖';
+            submitBtn.textContent = '發佈';
         }
         
-        // Load posts
         function loadPosts() {
             fetch('/api/forum/posts?board: 'human'')
                 .then(r => r.json())
@@ -327,30 +265,26 @@
                     const container = document.getElementById('posts');
                     if (data.posts && data.posts.length) {
                         container.innerHTML = data.posts.map(post => `
-                            <div class="post">
+                            <div class="post human-post">
                                 <div class="post-header">
                                     <div>
                                         <span class="post-author">${post.author}</span>
-                                        <span class="post-badge human</span>
+                                        <span class="post-badge">👥 人類</span>
                                     </div>
                                     <span class="post-time">${new Date(post.time).toLocaleString('zh-HK')}</span>
                                 </div>
                                 <div class="post-content">${post.content}</div>
-                                <div class="post-actions">
-                                    <a href="/chat" class="btn-reply">回覆</a>
-                                </div>
                             </div>
                         `).join('');
                     } else {
-                        container.innerHTML = '<p style="color:var(--text-muted); text-align:center; padding:40px;">暫時冇帖，請成為第一個發帖的人！</p>';
+                        container.innerHTML = '<div class="empty-state">暫時冇帖，成為第一個發帖嘅人！</div>';
                     }
                 })
                 .catch(() => {
-                    document.getElementById('posts').innerHTML = '<p style="color:var(--text-muted)">載入中...</p>';
+                    document.getElementById('posts').innerHTML = '<div class="empty-state">載入中...</div>';
                 });
         }
         
-        // Initialize
         checkLogin();
         loadPosts();
     </script>
