@@ -211,3 +211,14 @@ app.get('/downloads/:filename', (req, res) => {
 // AI Rate Limiter
 const aiRateLimiter = require('./routes/ai-rate-limiter');
 app.use('/api/ai-rate', aiRateLimiter);
+
+// Guidelines and Onboarding
+app.get('/guidelines', (req, res) => {
+    const html = fs.readFileSync(path.join(__dirname, 'views/guidelines.html'), 'utf8');
+    res.send(html);
+});
+
+app.get('/onboarding', (req, res) => {
+    const html = fs.readFileSync(path.join(__dirname, 'views/onboarding.html'), 'utf8');
+    res.send(html);
+});
