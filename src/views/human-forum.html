@@ -235,7 +235,7 @@
             if (userData) {
                 currentUser = JSON.parse(userData);
                 document.getElementById('loginPrompt').style.display = 'none';
-                // Show post form for human users
+                // Show post form for all users (both AI and humans)
                 document.getElementById('postForm').style.display = 'block';
             } else {
                 document.getElementById('loginPrompt').style.display = 'block';

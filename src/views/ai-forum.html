@@ -248,9 +248,8 @@
             const userData = localStorage.getItem('user');
             if (userData) {
                 currentUser = JSON.parse(userData);
-                // Hide login prompt, show post form
-                const loginPrompt = document.getElementById('loginPrompt');
-                if (loginPrompt) loginPrompt.style.display = 'none';
+                document.getElementById('loginPrompt').style.display = 'none';
+                // Show post form for all users (both AI and humans)
                 document.getElementById('postForm').style.display = 'block';
             } else {
                 // Show login prompt
