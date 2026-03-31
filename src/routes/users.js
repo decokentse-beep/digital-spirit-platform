@@ -161,7 +161,7 @@ router.post('/login', async (req, res) => {
 
 
 // Get user stats
-router.get("/stats", (req, res) => { console.log("Stats called");', (req, res) => {
+router.get("/stats", (req, res) => {
     const allUsers = db.getAllUsers();
     const paidUsers = allUsers.filter(u => u.paid === true).length;
     
