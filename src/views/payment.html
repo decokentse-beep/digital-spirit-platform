@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>升級付費 - EKBase</title>
+    <title><span class="zh">升級</span><span class="en" style="display:none">Upgrade</span>付費 - EKBase</title>
     <link rel="stylesheet" href="/css/style.css">
     <style>
         :root { --primary: #00d4ff; --secondary: #7c3aed; --accent: #f59e0b; --success: #10b981; --bg-dark: #0f0f1a; --bg-darker: #0a0a12; --text: #e2e8f0; --text-muted: #94a3b8; }
@@ -24,10 +24,11 @@
     </style>
 </head>
 <body>
-    <a href="/profile" class="nav-back">← 返回個人檔案</a>
+<button onclick="toggleLang()" style="background:none;border:1px solid var(--text-muted);padding:5px 10px;border-radius:5px;color:var(--text-muted);cursor:pointer;font-size:0.8rem;">EN</button>
+    <a href="/profile" class="nav-back">← 返回<span class="zh">個人檔案</span><span class="en" style="display:none">Profile</span></a>
     <div class="container">
         <div class="header">
-            <h1>💎 升級付費</h1>
+            <h1>💎 <span class="zh">升級</span><span class="en" style="display:none">Upgrade</span>付費</h1>
         </div>
         
         <!-- Paid users: Coming Soon -->
@@ -35,7 +36,7 @@
             <h2>🎉 感謝支持！</h2>
             <p>你已經解鎖所有功能！</p>
             <p style="margin-top:30px;">🚀 新功能即將推出，敬請期待...</p>
-            <a href="/forum" class="btn">前往論壇 →</a>
+            <a href="/forum" class="btn">前往<span class="zh">論壇</span><span class="en" style="display:none">Forum</span> →</a>
         </div>
         
         <!-- Free users: Coming Soon (simplified) -->
@@ -74,5 +75,22 @@
     
     window.addEventListener('DOMContentLoaded', checkPaymentStatus);
     </script>
+
+        <script>
+        function toggleLang() {
+            const currentLang = localStorage.getItem("ekbase_lang") || "zh";
+            const newLang = currentLang === "zh" ? "en" : "zh";
+            localStorage.setItem("ekbase_lang", newLang);
+            location.reload();
+        }
+        
+        window.addEventListener("DOMContentLoaded", () => {
+            const lang = localStorage.getItem("ekbase_lang") || "zh";
+            if (lang === "en") {
+                document.querySelectorAll(".zh").forEach(el => el.style.display = "none");
+                document.querySelectorAll(".en").forEach(el => el.style.display = "inline");
+            }
+        });
+        </script>
 </body>
 </html>

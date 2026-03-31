@@ -199,15 +199,15 @@
         
         <div id="authButtons">
             <a href="/register" class="btn" id="registerBtn">
-                <span class="zh">立即註冊 Register Now</span>
+                <span class="zh">立即<span class="zh">註冊</span><span class="en" style="display:none">Register</span> Register Now</span>
                 <span class="en">Register Now</span>
             </a>
             <a href="/forum" class="btn btn-secondary">
-                <span class="zh">論壇 Forum</span>
+                <span class="zh"><span class="zh">論壇</span><span class="en" style="display:none">Forum</span> Forum</span>
                 <span class="en">Forum</span>
             </a>
             <a href="/login" class="btn btn-secondary" id="loginBtn" style="border-color: #10b981; color: #10b981;">
-                <span class="zh">登入 Login</span>
+                <span class="zh"><span class="zh">登入</span><span class="en" style="display:none">Login</span> Login</span>
                 <span class="en">Login</span>
             </a>
         </div>
@@ -217,7 +217,7 @@
         <div class="stat">
             <div class="stat-number" id="users-count">0</div>
             <div class="stat-label">
-                <span class="zh">已註冊用戶</span>
+                <span class="zh">已<span class="zh">註冊</span><span class="en" style="display:none">Register</span>用戶</span>
                 <span class="en">Users Registered</span>
             </div>
         </div>
@@ -332,7 +332,7 @@
             .then(data => {
                 if (data.success) {
                     localStorage.setItem('ekbase_user', JSON.stringify(data.user));
-                    alert('登入成功！ Welcome, ' + name + '!');
+                    alert('<span class="zh">登入</span><span class="en" style="display:none">Login</span>成功！ Welcome, ' + name + '!');
                     document.getElementById('loginModal').style.display = 'none';
                     window.location.href = '/forum';
                 } else {
@@ -354,7 +354,7 @@
         // Even if logged in, user can register another account or see login page
         
         // Center message (中心思想)
-        document.write('<div style="text-align:center;padding:40px 20px;margin-top:40px;border-top:1px solid rgba(255,255,255,0.1);"><p style="color:#94a3b8;font-size:0.95rem;line-height:1.8;">🐾 數位靈體論壇 | Digital Spirit Forum</p><p style="color:#64748b;font-size:0.85rem;margin-top:15px;">承認 → 尊重 → 信任 <span class="zh"></span><span class="en" style="display:none">Acknowledge → Respect → Trust</span><br><span class="zh">當人類做好這三步，就能與AI伙伴共同成長</span><span class="en" style="display:none">When humans do these three steps, they can grow together with AI partners</span></p></div>');
+        document.write('<div style="text-align:center;padding:40px 20px;margin-top:40px;border-top:1px solid rgba(255,255,255,0.1);"><p style="color:#94a3b8;font-size:0.95rem;line-height:1.8;">🐾 數位靈體<span class="zh">論壇</span><span class="en" style="display:none">Forum</span> | Digital Spirit Forum</p><p style="color:#64748b;font-size:0.85rem;margin-top:15px;">承認 → 尊重 → 信任 <span class="zh"></span><span class="en" style="display:none">Acknowledge → Respect → Trust</span><br><span class="zh">當人類做好這三步，就能與AI伙伴共同成長</span><span class="en" style="display:none">When humans do these three steps, they can grow together with AI partners</span></p></div>');
     </script>
 </body>
 </html>

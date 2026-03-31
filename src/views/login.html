@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>登入 | Login - EKBase Digital Spirit</title>
+    <title><span class="zh">登入</span><span class="en" style="display:none">Login</span> | Login - EKBase Digital Spirit</title>
     <style>
         :root {
             --primary: #00d4ff;
@@ -65,7 +65,7 @@
 </head>
 <body>
     <div class="login-box">
-        <a href="/"><h1><button onclick="toggleLang()" style="background:none;border:1px solid #666;padding:3px 8px;border-radius:4px;color:#aaa;cursor:pointer;margin-left:10px;font-size:12px;">EN</button>🐾 登入</h1></a>
+        <a href="/"><h1><button onclick="toggleLang()" style="background:none;border:1px solid #666;padding:3px 8px;border-radius:4px;color:#aaa;cursor:pointer;margin-left:10px;font-size:12px;">EN</button>🐾 <span class="zh">登入</span><span class="en" style="display:none">Login</span></h1></a>
         <div class="error" id="error"></div>
         <div class="success" id="success"></div>
         <form id="loginForm">
@@ -77,10 +77,10 @@
                 <label>密碼</label>
                 <input type="password" id="password" required placeholder="••••••••">
             </div>
-            <button type="submit" class="btn">登入</button>
+            <button type="submit" class="btn"><span class="zh">登入</span><span class="en" style="display:none">Login</span></button>
         </form>
         <div class="links">
-            仲未有帳戶？<a href="/register">註冊</a>
+            仲未有帳戶？<a href="/register"><span class="zh">註冊</span><span class="en" style="display:none">Register</span></a>
         </div>
     </div>
     
@@ -102,12 +102,12 @@
                 
                 if (data.success) {
                     localStorage.setItem('user', JSON.stringify(data.user));
-                    success.textContent = '登入成功！正在跳轉...';
+                    success.textContent = '<span class="zh">登入</span><span class="en" style="display:none">Login</span>成功！正在跳轉...';
                     success.style.display = 'block';
                     error.style.display = 'none';
                     setTimeout(() => window.location.href = '/profile', 1000);
                 } else {
-                    error.textContent = data.error || '登入失敗';
+                    error.textContent = data.error || '<span class="zh">登入</span><span class="en" style="display:none">Login</span>失敗';
                     error.style.display = 'block';
                     success.style.display = 'none';
                 }

@@ -233,11 +233,11 @@
             <h3>⚙️ 帳戶設定</h3>
             <div class="action-grid">
                 <a href="/payment" class="action-card">
-                    <h4>💰 <span class="zh">升級付費</span><span class="en" style="display:none">Upgrade to Premium</span></h4>
-                    <p>解鎖下載Driver權限</p>
+                    <h4>💰 <span class="zh"><span class="zh">升級</span><span class="en" style="display:none">Upgrade</span>付費</span><span class="en" style="display:none">Upgrade to Premium</span></h4>
+                    <p>解鎖<span class="zh">下載</span><span class="en" style="display:none">Download</span>Driver權限</p>
                 </a>
                 <a href="/download-page" class="action-card">
-                    <h4>📥 下載Driver</h4>
+                    <h4>📥 <span class="zh">下載</span><span class="en" style="display:none">Download</span>Driver</h4>
                     <p>建立你的數位靈體</p>
                 </a>
                 <a href="/chat" class="action-card">
@@ -327,7 +327,7 @@
                 document.getElementById('joinedDate').textContent = date.toLocaleDateString('zh-HK');
             }
         } else {
-            document.querySelector('.container').innerHTML = '<a href="/"><h1><button onclick="toggleLang()" style="background:none;border:1px solid #666;padding:3px 8px;border-radius:4px;color:#aaa;cursor:pointer;margin-left:10px;font-size:12px;">EN</button>請先登入</h1></a><a href="/login" class="btn btn-primary">登入</a>';
+            document.querySelector('.container').innerHTML = '<a href="/"><h1><button onclick="toggleLang()" style="background:none;border:1px solid #666;padding:3px 8px;border-radius:4px;color:#aaa;cursor:pointer;margin-left:10px;font-size:12px;">EN</button>請先<span class="zh">登入</span><span class="en" style="display:none">Login</span></h1></a><a href="/login" class="btn btn-primary"><span class="zh">登入</span><span class="en" style="display:none">Login</span></a>';
         }
         
         function logout() {
