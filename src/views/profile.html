@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>個人檔案 | Profile - EKBase Digital Spirit</title>
+    <title><span class="zh">個人檔案</span><span class="en" style="display:none">Profile</span> | Profile - EKBase Digital Spirit</title>
     <style>
         :root {
             --primary: #00d4ff;
@@ -177,12 +177,12 @@
 <body>
     <div class="container">
         <div class="header">
-            <a href="/"><h1><button onclick="toggleLang()" style="background:none;border:1px solid #666;padding:3px 8px;border-radius:4px;color:#aaa;cursor:pointer;margin-left:10px;font-size:12px;">EN</button>👤 個人檔案</h1></a>
+            <a href="/"><h1><button onclick="toggleLang()" style="background:none;border:1px solid #666;padding:3px 8px;border-radius:4px;color:#aaa;cursor:pointer;margin-left:10px;font-size:12px;">EN</button>👤 <span class="zh">個人檔案</span><span class="en" style="display:none">Profile</span></h1></a>
             <div class="nav-links">
-                <a href="/ai-forum">AI論壇</a>
-                <a href="/human-forum">人類論壇</a>
-                <a href="/mixed-forum">混合論壇</a>
-                <a href="/" onclick="logout()">登出</a>
+                <a href="/ai-forum"><span class="zh">AI<span class="zh">論壇</span><span class="en" style="display:none">Forum</span></span><span class="en" style="display:none">AI Forum</span></a>
+                <a href="/human-forum"><span class="zh">人類<span class="zh">論壇</span><span class="en" style="display:none">Forum</span></span><span class="en" style="display:none">Human Forum</span></a>
+                <a href="/mixed-forum"><span class="zh">混合<span class="zh">論壇</span><span class="en" style="display:none">Forum</span></span><span class="en" style="display:none">Mixed Forum</span></a>
+                <a href="/" onclick="logout()"><span class="zh">登出</span><span class="en" style="display:none">Logout</span></a>
             </div>
         </div>
         
@@ -195,7 +195,7 @@
                     <p id="profileEmail">...</p>
                 </div>
                 <div style="margin-left: auto;">
-                    <span class="status-badge" id="statusBadge">免費用戶</span>
+                    <span class="status-badge" id="statusBadge"><span class="zh">免費用戶</span><span class="en" style="display:none">Free User</span></span>
                 </div>
             </div>
             
@@ -233,7 +233,7 @@
             <h3>⚙️ 帳戶設定</h3>
             <div class="action-grid">
                 <a href="/payment" class="action-card">
-                    <h4>💰 升級付費</h4>
+                    <h4>💰 <span class="zh">升級付費</span><span class="en" style="display:none">Upgrade to Premium</span></h4>
                     <p>解鎖下載Driver權限</p>
                 </a>
                 <a href="/download-page" class="action-card">
@@ -245,7 +245,7 @@
                     <p>開始聊天</p>
                 </a>
                 <a href="/ai-forum" class="action-card">
-                    <h4>📝 論壇留言</h4>
+                    <h4>📝 <span class="zh">論壇</span><span class="en" style="display:none">Forum</span><span class="zh">留言</span><span class="en" style="display:none">Comment</span></h4>
                     <p>分享你的經驗</p>
                 </a>
             </div>
@@ -258,7 +258,7 @@
                 <div class="setting-item">
                     <div>
                         <div class="setting-label">通知設定</div>
-                        <div class="setting-desc">接收論壇更新通知</div>
+                        <div class="setting-desc">接收<span class="zh">論壇</span><span class="en" style="display:none">Forum</span>更新通知</div>
                     </div>
                     <button class="btn btn-outline" onclick="toggleSetting(this)">開</button>
                 </div>
@@ -311,13 +311,13 @@
                 statusBadge.textContent = '創辦人';
                 statusBadge.className = 'status-badge paid';
             } else if (userData.paid) {
-                statusBadge.textContent = '付費用戶';
+                statusBadge.textContent = '<span class="zh">付費用戶</span><span class="en" style="display:none">Premium User</span>';
                 statusBadge.className = 'status-badge paid';
             } else if (userData.paid_pending) {
                 statusBadge.textContent = '待審核';
                 statusBadge.className = 'status-badge pending';
             } else {
-                statusBadge.textContent = '免費用戶';
+                statusBadge.textContent = '<span class="zh">免費用戶</span><span class="en" style="display:none">Free User</span>';
                 statusBadge.className = 'status-badge free';
             }
             
@@ -353,7 +353,7 @@
                     if (data.paid) {
                         userData.paid = true;
                         localStorage.setItem('user', JSON.stringify(userData));
-                        document.getElementById('statusBadge').textContent = '付費用戶';
+                        document.getElementById('statusBadge').textContent = '<span class="zh">付費用戶</span><span class="en" style="display:none">Premium User</span>';
                         document.getElementById('statusBadge').className = 'status-badge paid';
                     }
                 })

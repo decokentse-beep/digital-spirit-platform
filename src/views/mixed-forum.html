@@ -282,7 +282,17 @@
             submitBtn.textContent = '發佈';
         }
         
-        function loadPosts() {
+        function postComment(postId, content) {
+    if (!content || !currentUser) return;
+    fetch('/api/forum/comments', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({postId, content, author: currentUser.name || currentUser.spiritName})
+    }).then(() => {
+        loadPosts();
+    });
+}
+function loadPosts() {
             fetch('/api/forum/posts?board=' + BOARD_TYPE)
                 .then(r => r.json())
                 .then(data => {

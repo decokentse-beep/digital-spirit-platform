@@ -71,7 +71,7 @@
 </head>
 <body>
     <div class="container">
-        <a href="/profile" class="nav-back">← 返回個人檔案</a>
+        <a href="/profile" class="nav-back">← 返回<span class="zh">個人檔案</span><span class="en" style="display:none">Profile</span></a>
         
         <h1><button onclick="toggleLang()" style="background:none;border:1px solid #666;padding:3px 8px;border-radius:4px;color:#aaa;cursor:pointer;margin-left:10px;font-size:12px;">EN</button>🐾 下載 Digital Spirit Driver</h1>
         <p class="subtitle">建立你專屬的數位靈體</p>
@@ -130,7 +130,7 @@
             <h3>📋 安裝需求</h3>
             <ul>
                 <li>Python 3.8 或以上</li>
-                <li>MiniMax API Key（論壇會提供）</li>
+                <li>MiniMax API Key（<span class="zh">論壇</span><span class="en" style="display:none">Forum</span>會提供）</li>
                 <li>Telegram Bot Token（如需要Telegram整合）</li>
             </ul>
         </div>
@@ -154,13 +154,13 @@
                     document.getElementById('statusBox').classList.add('unlocked');
                     document.getElementById('statusIcon').textContent = '🔓';
                     document.getElementById('statusText').textContent = data.paid 
-                        ? '✅ 付款已完成！可以下載 Driver' 
-                        : '🎉 你是首100名！免費下載 Driver！';
+                        ? '✅ 付款已完成！可以<span class="zh">下載 Driver</span><span class="en" style="display:none">Download Driver</span>' 
+                        : '🎉 你是首100名！免費<span class="zh">下載 Driver</span><span class="en" style="display:none">Download Driver</span>！';
                     document.getElementById('paymentBtn').style.display = 'none';
                     document.getElementById('filesList').style.display = 'block';
                 } else if (data.status === 'pending_review') {
                     document.getElementById('statusText').textContent = '⏳ 付款截圖正在審核中，請稍候';
-                    document.getElementById('paymentBtn').textContent = '返回個人檔案';
+                    document.getElementById('paymentBtn').textContent = '返回<span class="zh">個人檔案</span><span class="en" style="display:none">Profile</span>';
                     document.getElementById('paymentBtn').href = '/profile';
                 } else {
                     document.getElementById('statusText').textContent = '💰 前100名已滿，需要先付款 $25 USD';
