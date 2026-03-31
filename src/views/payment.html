@@ -1,260 +1,141 @@
 <!DOCTYPE html>
-<html lang="zh">
+<html lang="zh-HK">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>付款 | Payment - EKBase Digital Spirit</title>
+    <title>升級付費 - EKBase</title>
+    <link rel="stylesheet" href="/css/style.css">
     <style>
-        :root {
-            --primary: #00d4ff;
-            --success: #10b981;
-            --error: #ef4444;
-            --bg-dark: #1a1a2e;
-            --bg-darker: #16213e;
-            --text: #fff;
-            --text-muted: #94a3b8;
-        }
-        body { 
-            font-family: -apple-system, sans-serif;
-            background: linear-gradient(135deg, var(--bg-dark) 0%, var(--bg-darker) 100%);
-            min-height: 100vh;
-            color: var(--text);
-            padding: 30px;
-        }
-        .container { max-width: 600px; margin: 0 auto; }
-        h1 { color: var(--primary); text-align: center; margin-bottom: 30px; }
-        .step {
-            background: rgba(255,255,255,0.05);
-            border-radius: 12px;
-            padding: 25px;
-            margin-bottom: 20px;
-        }
-        .step h2 { font-size: 1.1rem; margin-bottom: 15px; color: var(--text-muted); }
-        .qr-container { text-align: center; }
-        .qr-img { 
-            max-width: 250px; 
-            border-radius: 12px; 
-            border: 2px solid rgba(255,255,255,0.1);
-        }
-        .amount {
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: var(--primary);
-            margin: 15px 0;
-        }
-        .upload-area {
-            border: 2px dashed rgba(255,255,255,0.2);
-            border-radius: 12px;
-            padding: 40px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        .upload-area:hover { border-color: var(--primary); background: rgba(0,212,255,0.05); }
-        .upload-area.dragover { border-color: var(--success); background: rgba(16,185,129,0.1); }
-        .upload-icon { font-size: 3rem; margin-bottom: 15px; }
-        .preview { max-width: 100%; border-radius: 8px; margin-top: 20px; display: none; }
-        .btn {
-            width: 100%;
-            padding: 15px;
-            background: var(--primary);
-            color: #000;
-            border: none;
-            border-radius: 8px;
-            font-size: 1rem;
-            font-weight: bold;
-            cursor: pointer;
-            margin-top: 20px;
-        }
-        .btn:disabled { background: var(--text-muted); cursor: not-allowed; }
-        .status {
-            padding: 15px;
-            border-radius: 8px;
-            margin-top: 20px;
-            text-align: center;
-            display: none;
-        }
-        .status.success { background: rgba(16,185,129,0.2); color: var(--success); }
-        .status.error { background: rgba(239,68,68,0.2); color: var(--error); }
-        .status.pending { background: rgba(245,158,11,0.2); color: #f59e0b; }
-        .nav-back { color: var(--text-muted); text-decoration: none; margin-bottom: 20px; display: inline-block; }
+        :root { --primary: #00d4ff; --secondary: #7c3aed; --accent: #f59e0b; --success: #10b981; --bg-dark: #0f0f1a; --bg-darker: #0a0a12; --text: #e2e8f0; --text-muted: #94a3b8; }
+        body { background: linear-gradient(135deg, var(--bg-dark) 0%, var(--bg-darker) 100%); color: var(--text); font-family: 'Noto Sans HK', sans-serif; min-height: 100vh; margin: 0; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        .header { text-align: center; padding: 30px 0; }
+        .header h1 { color: var(--primary); margin: 0; }
+        .nav-back { position: absolute; top: 20px; left: 20px; color: var(--text-muted); text-decoration: none; }
+        .nav-back:hover { color: var(--primary); }
+        
+        /* Feature Selection */
+        .feature-selection { padding: 20px; }
+        .feature-option { display: flex; align-items: center; gap: 15px; padding: 20px; background: rgba(255,255,255,0.05); border-radius: 12px; margin-bottom: 15px; cursor: pointer; border: 2px solid transparent; transition: all 0.3s; }
+        .feature-option:hover { border-color: var(--primary); }
+        .feature-option.selected { border-color: var(--primary); background: rgba(0,212,255,0.1); }
+        .feature-option input { display: none; }
+        .feature-icon { font-size: 2rem; }
+        .feature-info h3 { margin: 0 0 5px 0; }
+        .feature-info p { margin: 0; color: var(--text-muted); font-size: 0.9rem; }
+        
+        .btn { display: block; width: 100%; padding: 15px; background: var(--primary); border: none; border-radius: 10px; color: #000; font-size: 1rem; font-weight: bold; cursor: pointer; margin-top: 20px; }
+        .btn:hover { opacity: 0.9; }
+        
+        /* QR Section */
+        .qr-section { text-align: center; padding: 30px; }
+        .qr-code { max-width: 250px; border-radius: 10px; margin: 20px 0; }
+        .qr-section p { color: var(--text-muted); }
+        
+        /* Coming Soon */
+        .coming-soon { text-align: center; padding: 60px 20px; }
+        .coming-soon h2 { color: var(--success); font-size: 1.5rem; }
+        .coming-soon p { color: var(--text-muted); margin-top: 20px; }
+        
+        .back-btn { display: inline-block; margin-top: 30px; padding: 10px 20px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: var(--text); text-decoration: none; }
     </style>
 </head>
 <body>
+    <a href="/profile" class="nav-back">← 返回個人檔案</a>
     <div class="container">
-        <a href="/profile" class="nav-back">← 返回<span class="zh">個人檔案</span><span class="en" style="display:none">Profile</span></a>
+        <div class="header">
+            <h1>💎 升級付費</h1>
+        </div>
         
-        <a href="/"><h1><button onclick="toggleLang()" style="background:none;border:1px solid #666;padding:3px 8px;border-radius:4px;color:#aaa;cursor:pointer;margin-left:10px;font-size:12px;">EN</button>💰 付款升級</h1></a>
+        <!-- For paid users: Show Coming Soon -->
+        <div class="coming-soon" id="comingSoon">
+            <h2>🎉 感謝支持！</h2>
+            <p>你已經解鎖所有功能！</p>
+            <p>新功能即將推出，敬請期待...</p>
+            <a href="/forum" class="btn" style="display:inline-block; width:auto; margin-top:30px;">前往論壇 →</a>
+        </div>
         
-        <div class="step">
-            <h2>第一步：Scan QR Code 付款</h2>
-            <div class="qr-container">
-                <img src="/images/paypal-coco.jpg" alt="PayPal QR Code" class="qr-img" onerror="this.style.display='none'">
-                <div style="margin-top:15px; color:var(--text-muted)">
-                    <p>Scan 上面 QR Code 使用 PayPal 付款</p>
-                    <div class="amount">$25 USD</div>
+        <!-- For free users: Feature Selection -->
+        <div class="feature-selection" id="featureSelection" style="display:none;">
+            <h3 style="text-align:center;">選擇你想解鎖既功能</h3>
+            
+            <label class="feature-option selected">
+                <input type="radio" name="feature" value="premium" checked>
+                <span class="feature-icon">💎</span>
+                <div class="feature-info">
+                    <h3>Premium 會籍</h3>
+                    <p>解鎖所有功能 + 未來更新</p>
                 </div>
-            </div>
+            </label>
+            
+            <label class="feature-option">
+                <input type="radio" name="feature" value="forum">
+                <span class="feature-icon">💬</span>
+                <div class="feature-info">
+                    <h3>AI論壇發布權</h3>
+                    <p>可以在AI論壇發布帖子</p>
+                </div>
+            </label>
+            
+            <button class="btn" onclick="showQR()">確認選擇 →</button>
         </div>
         
-        <div class="step">
-            <h2>第二步：上傳付款截圖</h2>
-            <div class="upload-area" id="uploadArea">
-                <div class="upload-icon">📤</div>
-                <p>點擊或拖曳截圖到呢度</p>
-                <p style="font-size:0.85rem; color:var(--text-muted)">支援 JPG, PNG 格式</p>
-                <input type="file" id="fileInput" accept="image/*" style="display:none">
-            </div>
-            <img id="preview" class="preview" alt="預覽">
+        <!-- QR Code -->
+        <div class="qr-section" id="qrSection" style="display:none;">
+            <h3>掃描付款</h3>
+            <img src="/images/paypal-coco.jpg" alt="PayPal QR Code" class="qr-code">
+            <p>使用 PayPal 掃描 QR Code</p>
+            <a href="#" class="back-btn" onclick="backToSelection()">← 返回選擇</a>
         </div>
-        
-        <button class="btn" id="submitBtn" disabled>提交付款截圖</button>
-        
-        <div class="status" id="status"></div>
     </div>
     
     <script>
-        const uploadArea = document.getElementById('uploadArea');
-        const fileInput = document.getElementById('fileInput');
-        const preview = document.getElementById('preview');
-        const submitBtn = document.getElementById('submitBtn');
-        const status = document.getElementById('status');
-        let selectedFile = null;
-        
-        // Click to upload
-        uploadArea.addEventListener('click', () => fileInput.click());
-        
-        // Drag and drop
-        uploadArea.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            uploadArea.classList.add('dragover');
-        });
-        uploadArea.addEventListener('dragleave', () => {
-            uploadArea.classList.remove('dragover');
-        });
-        uploadArea.addEventListener('drop', (e) => {
-            e.preventDefault();
-            uploadArea.classList.remove('dragover');
-            const file = e.dataTransfer.files[0];
-            if (file && file.type.startsWith('image/')) {
-                handleFile(file);
-            }
-        });
-        
-        // File selected
-        fileInput.addEventListener('change', (e) => {
-            if (e.target.files[0]) handleFile(e.target.files[0]);
-        });
-        
-        function handleFile(file) {
-            selectedFile = file;
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                preview.src = e.target.result;
-                preview.style.display = 'block';
-                submitBtn.disabled = false;
-            };
-            reader.readAsDataURL(file);
+    // Check if user is paid
+    async function checkPaymentStatus() {
+        const user = JSON.parse(localStorage.getItem('ekbase_user') || localStorage.getItem('user') || '{}');
+        if (!user.email) {
+            showSelection();
+            return;
         }
         
-        // Submit
-        submitBtn.addEventListener('click', async () => {
-            if (!selectedFile) return;
+        try {
+            const res = await fetch('/api/payment/status?email=' + user.email);
+            const data = await res.json();
             
-            const user = JSON.parse(localStorage.getItem('user') || '{}');
-            if (!user.email) {
-                alert('請先登入');
-                window.location.href = '/login';
-                return;
+            if (data.paid) {
+                document.getElementById('comingSoon').style.display = 'block';
+                document.getElementById('featureSelection').style.display = 'none';
+            } else {
+                showSelection();
             }
-            
-            submitBtn.disabled = true;
-            submitBtn.textContent = '上傳中...';
-            status.style.display = 'none';
-            
-            const formData = new FormData();
-            formData.append('screenshot', selectedFile);
-            formData.append('email', user.email);
-            formData.append('name', user.name);
-            
-            try {
-                const res = await fetch('/api/payment/upload', {
-                    method: 'POST',
-                    body: formData
-                });
-                const data = await res.json();
-                
-                if (data.success) {
-                    status.className = 'status pending';
-                    status.textContent = '✅ 截圖已上傳！等待審核中...';
-                    status.style.display = 'block';
-                    
-                    // Update local storage
-                    user.paid_pending = true;
-                    localStorage.setItem('user', JSON.stringify(user));
-                    
-                    setTimeout(() => {
-                        window.location.href = '/profile';
-                    }, 2000);
-                } else {
-                    status.className = 'status error';
-                    status.textContent = data.error || '上傳失敗';
-                    status.style.display = 'block';
-                    submitBtn.disabled = false;
-                    submitBtn.textContent = '重新提交';
-                }
-            } catch (err) {
-                status.className = 'status error';
-                status.textContent = '網絡錯誤，請重試';
-                status.style.display = 'block';
-                submitBtn.disabled = false;
-                submitBtn.textContent = '重新提交';
-            }
-        });
+        } catch (e) {
+            showSelection();
+        }
+    }
     
-        function toggleLang() {
-            const newLang = localStorage.getItem('ekbase_lang') === 'en' ? 'zh' : 'en';
-            localStorage.setItem('ekbase_lang', newLang);
-            location.reload();
-        }
-        
-        window.addEventListener('DOMContentLoaded', () => {
-            const lang = localStorage.getItem('ekbase_lang') || 'zh';
-            if (lang === 'en') {
-                document.querySelectorAll('.zh').forEach(el => el.style.display = 'none');
-                document.querySelectorAll('.en').forEach(el => el.style.display = 'inline');
-            }
-        });
-
+    function showSelection() {
+        document.getElementById('comingSoon').style.display = 'none';
+        document.getElementById('featureSelection').style.display = 'block';
+    }
+    
+    function showQR() {
+        document.getElementById('featureSelection').style.display = 'none';
+        document.getElementById('qrSection').style.display = 'block';
+    }
+    
+    function backToSelection() {
+        document.getElementById('qrSection').style.display = 'none';
+        document.getElementById('featureSelection').style.display = 'block';
+    }
+    
+    // Toggle language
+    function toggleLang() {
+        const newLang = localStorage.getItem('ekbase_lang') === 'en' ? 'zh' : 'en';
+        localStorage.setItem('ekbase_lang', newLang);
+        location.reload();
+    }
+    
+    window.addEventListener('DOMContentLoaded', checkPaymentStatus);
     </script>
-
-        <script>
-        async function checkPaymentStatus() {
-            const user = JSON.parse(localStorage.getItem('user') || '{}');
-            if (!user.email) return;
-            
-            try {
-                const res = await fetch(`/api/payment/status?email=${user.email}`);
-                const data = await res.json();
-                
-                if (data.paid) {
-                    document.getElementById('qrSection').style.display = 'none';
-                    document.getElementById('comingSoon').style.display = 'block';
-                }
-            } catch (e) { console.error(e); }
-        }
-        checkPaymentStatus();
-        </script>
-
-<script>
-function showPayment() {
-    document.getElementById('featureSelection').style.display = 'none';
-    document.getElementById('qrSection').style.display = 'block';
-}
-function backToSelection() {
-    document.getElementById('qrSection').style.display = 'none';
-    document.getElementById('featureSelection').style.display = 'block';
-}
-</script>
 </body>
 </html>
