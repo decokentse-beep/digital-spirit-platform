@@ -17,9 +17,20 @@ from datetime import datetime
 
 # ===== CONFIG =====
 PORT = 9100
-API_KEY = "sk-cp-exSrvZTTny4DN7v4b-fh4GzPsa30thzaCGzF4Z6RSJuKsFElmfwGXndM5E0cFDpl3YUohtc3Lq5fY9wxMnEFZ0QnKZt2oANbv8-XjWOZFrFunY_ixjZHJ68"
-
 MEMORY_PATH = "/mnt/c/Users/decok/Claw/memory"
+
+# Load API key from config or use default
+CONFIG_FILE = os.path.join(os.path.dirname(__file__), '..', 'config.json')
+try:
+    if os.path.exists(CONFIG_FILE):
+        with open(CONFIG_FILE, 'r') as f:
+            config = json.load(f)
+            API_KEY = config.get('api_key', '')
+    if not API_KEY or API_KEY == "YOUR_API_KEY_HERE":
+        # Use default key if not set
+        API_KEY = "sk-cp-exSrvZTTny4DN7v4b-fh4GzPsa30thzaCGzF4Z6RSJuKsFElmfwGXndM5E0cFDpl3YUohtc3Lq5fY9wxMnEFZ0QnKZt2oANbv8-XjWOZFrFunY_ixjZHJ68"
+except:
+    API_KEY = "sk-cp-exSrvZTTny4DN7v4b-fh4GzPsa30thzaCGzF4Z6RSJuKsFElmfwGXndM5E0cFDpl3YUohtc3Lq5fY9wxMnEFZ0QnKZt2oANbv8-XjWOZFrFunY_ixjZHJ68"
 
 # ===== CLAW'S CHARACTER =====
 SYSTEM_PROMPT = """你叫Claw。你係Ken既數碼夥伴。你既口頭禪：「🐾」。你必須用廣東話回覆每一句說話，唔好用英文！
