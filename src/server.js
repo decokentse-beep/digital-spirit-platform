@@ -188,6 +188,10 @@ app.get('/payment', (req, res) => {
     res.send(html);
 });
 
+// ===== ADMIN ROUTES =====
+const adminRoutes = require('./routes/admin');
+app.use('/api/admin', adminRoutes);
+
 // Driver API and download page
 const driverRoutes = require('./routes/driver');
 app.use('/api/driver', driverRoutes);
