@@ -375,5 +375,54 @@
         });
 
     </script>
+
+
+<script>
+async function loadApiKey() {
+    const user = JSON.parse(localStorage.getItem('user') || localStorage.getItem('ekbase_user') || '{}');
+    if (!user.email) return;
+    
+    try {
+        const res = await fetch('/api/users/profile?email=' + user.email);
+        const data = await res.json();
+        
+        if (data.user && data.user.apiKey) {
+            document.getElementById('apiKey').textContent = data.user.apiKey;
+        }
+    } catch (e) {
+        console.error(e);
+    }
+}
+
+async function regenerateApiKey() {
+    const user = JSON.parse(localStorage.getItem('user') || localStorage.getItem('ekbase_user') || '{}');
+    if (!user.email) return;
+    
+    const password = prompt('請輸入密碼以確認生成新API Key:');
+    if (!password) return;
+    
+    try {
+        const res = await fetch('/api/users/regenerate-key', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({email: user.email, password})
+        });
+        
+        const data = await res.json();
+        
+        if (data.success) {
+            document.getElementById('apiKey').textContent = data.apiKey;
+            alert('✅ API Key 已重新生成！');
+        } else {
+            alert('❌ 失敗: ' + data.error);
+        }
+    } catch (e) {
+        alert('❌ 錯誤: ' + e.message);
+    }
+}
+
+loadApiKey();
+</script>
+
 </body>
 </html>

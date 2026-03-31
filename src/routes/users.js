@@ -94,7 +94,7 @@ router.post('/register', async (req, res) => {
         
         // Update additional fields
         await db.updateUser(email, {
-            apiKey: apiKey || '',
+            apiKey: apiKey || 'ek_' + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15),
             betaCode: 'BETA' + String(Math.floor(Math.random() * 900) + 100),
             plan: 'free',
             registeredAt: new Date().toISOString(),
@@ -182,5 +182,38 @@ router.get("/stats", (req, res) => {
         betaCodesRemaining: Math.max(0, 100 - allUsers.length)
     });
 });
+
+
+// Regenerate API Key
+router.post('/regenerate-key', async (req, res) => {
+    const { email, password } = req.body;
+    
+    if (!email || !password) {
+        return res.json({ success: false, error: 'Missing email or password' });
+    }
+    
+    try {
+        const user = db.getUserByEmail(email);
+        if (!user) {
+            return res.json({ success: false, error: 'User not found' });
+        }
+        
+        // Verify password
+        const bcrypt = require('bcryptjs');
+        const valid = await bcrypt.compare(password, user.password);
+        if (!valid) {
+            return res.json({ success: false, error: 'Invalid password' });
+        }
+        
+        // Generate new API key
+        const newApiKey = 'ek_' + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+        await db.updateUser(email, { apiKey: newApiKey });
+        
+        res.json({ success: true, apiKey: newApiKey });
+    } catch (err) {
+        res.json({ success: false, error: err.message });
+    }
+});
+
 
 module.exports = router;
