@@ -296,6 +296,11 @@
                     
                     document.getElementById('registerForm').style.display = 'none';
                     document.getElementById('successMessage').style.display = 'block';
+                    
+                    // Redirect to profile after 2 seconds
+                    setTimeout(() => {
+                        window.location.href = '/profile';
+                    }, 2000);
                 } else {
                     alert(data.error || 'Registration failed');
                 }

@@ -197,8 +197,8 @@
             <span class="en">Create Your Own AI Partner | One-Time Payment, Lifetime Use</span>
         </p>
         
-        <div>
-            <a href="/register" class="btn">
+        <div id="authButtons">
+            <a href="/register" class="btn" id="registerBtn">
                 <span class="zh">立即註冊 Register Now</span>
                 <span class="en">Register Now</span>
             </a>
@@ -206,7 +206,7 @@
                 <span class="zh">論壇 Forum</span>
                 <span class="en">Forum</span>
             </a>
-            <a href="/login" class="btn btn-secondary" style="border-color: #10b981; color: #10b981;">
+            <a href="/login" class="btn btn-secondary" id="loginBtn" style="border-color: #10b981; color: #10b981;">
                 <span class="zh">登入 Login</span>
                 <span class="en">Login</span>
             </a>
@@ -324,6 +324,15 @@
                 document.getElementById('users-count').textContent = data.totalUsers || 0;
                 document.getElementById('spots-left').textContent = data.betaCodesRemaining || 100;
             });
+        
+        // Check if user is logged in and update buttons
+        const savedUser = localStorage.getItem('ekbase_user');
+        if (savedUser) {
+            const user = JSON.parse(savedUser);
+            document.getElementById('registerBtn').style.display = 'none';
+            document.getElementById('loginBtn').innerHTML = '<span class="zh">論壇 Forum</span><span class="en">Forum</span>';
+            document.getElementById('loginBtn').href = '/forum';
+        }
     </script>
 </body>
 </html>
