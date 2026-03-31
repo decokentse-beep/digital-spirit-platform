@@ -78,6 +78,17 @@ router.post('/register', async (req, res) => {
             return res.json({ success: false, error: result.error });
         }
         
+        // Check if first 100 - auto-set as paid!
+        const allUsers = db.getAllUsers();
+        if (allUsers.length <= 100) {
+            await db.updateUser(email, {
+                paid: true,
+                payment_status: 'paid',
+                payment_date: new Date().toISOString()
+            });
+            console.log(`🎉 User #${allUsers.length} - FREE (auto-paid)`);
+        }
+        
         // Update additional fields
         await db.updateUser(email, {
             apiKey: apiKey || '',
