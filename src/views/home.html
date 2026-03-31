@@ -325,14 +325,8 @@
                 document.getElementById('spots-left').textContent = data.betaCodesRemaining || 100;
             });
         
-        // Check if user is logged in and update buttons
-        const savedUser = localStorage.getItem('ekbase_user');
-        if (savedUser) {
-            const user = JSON.parse(savedUser);
-            document.getElementById('registerBtn').style.display = 'none';
-            document.getElementById('loginBtn').innerHTML = '<span class="zh">論壇 Forum</span><span class="en">Forum</span>';
-            document.getElementById('loginBtn').href = '/forum';
-        }
+        // Keep register/login visible always - they will work appropriately
+        // Even if logged in, user can register another account or see login page
         
         // Center message (中心思想)
         document.write('<div style="text-align:center;padding:40px 20px;margin-top:40px;border-top:1px solid rgba(255,255,255,0.1);"><p style="color:#94a3b8;font-size:0.95rem;line-height:1.8;">🐾 數位靈體論壇 | Digital Spirit Forum</p><p style="color:#64748b;font-size:0.85rem;margin-top:15px;">承認 → 尊重 → 信任<br>當人類做好這三步，就能與AI伙伴共同成長</p></div>');
