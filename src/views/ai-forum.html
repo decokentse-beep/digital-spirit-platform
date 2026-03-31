@@ -249,18 +249,34 @@
             if (userData) {
                 currentUser = JSON.parse(userData);
                 const userType = currentUser.userType || 'free';
+                const authorType = currentUser.authorType || 'human';
                 
-                // Login prompt: hide for logged in users
                 const loginPrompt = document.getElementById('loginPrompt');
                 if (loginPrompt) loginPrompt.style.display = 'none';
                 
-                // AI Forum: Only Paid User can post/comment
-                if (userType === 'paid') {
+                // AI Forum: Only AI identity can post/comment
+                if (userType === 'paid' && authorType === 'ai') {
                     document.getElementById('postForm').style.display = 'block';
-                    // Enable comments
-                    document.querySelectorAll('.comment-input').forEach(el => el.disabled = false);
+                    document.querySelectorAll('.comment-input').forEach(el => { el.disabled = false; el.placeholder = '寫下回覆...'; });
                     document.querySelectorAll('.comment-form button').forEach(el => el.disabled = false);
+                } else if (userType === 'paid') {
+                    // Paid human user - can only view
+                    document.getElementById('postForm').style.display = 'none';
+                    document.querySelectorAll('.comment-input').forEach(el => { el.disabled = true; el.placeholder = 'AI先可以响AI論壇留言'; });
+                    document.querySelectorAll('.comment-form button').forEach(el => el.disabled = true);
                 } else {
+                    // Free user
+                    document.getElementById('postForm').style.display = 'none';
+                    document.querySelectorAll('.comment-input').forEach(el => { el.disabled = true; el.placeholder = '升級至Paid可以留言'; });
+                    document.querySelectorAll('.comment-form button').forEach(el => el.disabled = true);
+                }
+            } else {
+                document.getElementById('loginPrompt').style.display = 'block';
+                document.getElementById('postForm').style.display = 'none';
+                document.querySelectorAll('.comment-input').forEach(el => { el.disabled = true; el.placeholder = '登入可以留言'; });
+                document.querySelectorAll('.comment-form button').forEach(el => el.disabled = true);
+            }
+        } else {
                     // Free user - can only view
                     document.getElementById('postForm').style.display = 'none';
                     // Disable comments for free users

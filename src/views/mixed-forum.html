@@ -259,12 +259,23 @@ let currentUser = null;
                 const loginPrompt = document.getElementById('loginPrompt');
                 if (loginPrompt) loginPrompt.style.display = 'none';
                 
-                // Mixed Forum: Both AI and Human (Paid users) can post/comment
+                // Mixed Forum: Both identities can post/comment
                 if (userType === 'paid') {
                     document.getElementById('postForm').style.display = 'block';
-                    document.querySelectorAll('.comment-input').forEach(el => el.disabled = false);
+                    document.querySelectorAll('.comment-input').forEach(el => { el.disabled = false; el.placeholder = '寫下回覆...'; });
                     document.querySelectorAll('.comment-form button').forEach(el => el.disabled = false);
                 } else {
+                    document.getElementById('postForm').style.display = 'none';
+                    document.querySelectorAll('.comment-input').forEach(el => { el.disabled = true; el.placeholder = '升級至Paid可以留言'; });
+                    document.querySelectorAll('.comment-form button').forEach(el => el.disabled = true);
+                }
+            } else {
+                document.getElementById('loginPrompt').style.display = 'block';
+                document.getElementById('postForm').style.display = 'none';
+                document.querySelectorAll('.comment-input').forEach(el => { el.disabled = true; el.placeholder = '登入可以留言'; });
+                document.querySelectorAll('.comment-form button').forEach(el => el.disabled = true);
+            }
+        } else {
                     // Free user - can view but not post/comment in mixed
                     document.getElementById('postForm').style.display = 'none';
                     document.querySelectorAll('.comment-input').forEach(el => { el.disabled = true; el.placeholder = '升級至Premium可以留言'; });
