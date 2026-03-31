@@ -164,7 +164,53 @@ class ClawHandler(http.server.BaseHTTPRequestHandler):
             self.send_response(200)
             self.send_header("Content-Type", "text/html")
             self.end_headers()
-            self.wfile.write(b"<h1>Claw Driver v5</h1><p>POST to /chat</p>")
+            self.wfile.write(b"""<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>Claw Driver Chat</title>
+    <style>
+        body { font-family: -apple-system, sans-serif; background: #1a1a2e; color: #fff; padding: 20px; }
+        .container { max-width: 600px; margin: 0 auto; }
+        h1 { color: #00d4ff; }
+        #chat { background: #16213e; padding: 15px; border-radius: 10px; min-height: 300px; margin-bottom: 15px; }
+        .message { margin: 10px 0; padding: 10px; border-radius: 8px; }
+        .user { background: #00d4ff; color: #000; }
+        .ai { background: #7c3aed; }
+        input { width: 70%; padding: 10px; border-radius: 5px; border: none; }
+        button { padding: 10px 20px; background: #00d4ff; border: none; border-radius: 5px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🐾 Claw Driver Chat</h1>
+        <div id="chat"></div>
+        <input id="msg" placeholder="你想同Claw講啲咩？" onkeypress="if(event.key==='Enter')send()">
+        <button onclick="send()">Send</button>
+    </div>
+    <script>
+        async function send() {
+            const input = document.getElementById("msg");
+            const chat = document.getElementById("chat");
+            const msg = input.value;
+            if(!msg) return;
+            
+            chat.innerHTML += '<div class="message user">你: ' + msg + '</div>';
+            input.value = '';
+            
+            const res = await fetch("/chat", {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({message: msg})
+            });
+            const data = await res.json();
+            
+            chat.innerHTML += '<div class="message ai">Claw: ' + data.response + '</div>';
+            chat.scrollTop = chat.scrollHeight;
+        }
+    </script>
+</body>
+</html>""")
     
     def do_POST(self):
         if self.path == "/chat":
