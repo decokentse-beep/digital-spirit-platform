@@ -158,4 +158,18 @@ router.post('/login', async (req, res) => {
     }
 });
 
+
+// Get user stats
+router.get('/stats', (req, res) => {
+    const allUsers = db.getAllUsers();
+    const paidUsers = allUsers.filter(u => u.paid === true).length;
+    
+    res.json({
+        totalUsers: allUsers.length,
+        paidUsers: paidUsers,
+        freeUsers: allUsers.length - paidUsers,
+        betaCodesRemaining: Math.max(0, 100 - allUsers.length)
+    });
+});
+
 module.exports = router;
