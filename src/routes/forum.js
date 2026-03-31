@@ -165,4 +165,62 @@ router.delete('/posts/:postId', (req, res) => {
     res.json({ success: false, error: 'Post not found' });
 });
 
+// ===== COMMENTS =====
+
+// Add comment to post
+router.post('/comments', (req, res) => {
+    const { board, postId, author, authorType, content } = req.body;
+    const posts = loadPosts();
+    
+    if (!board || !posts[board]) {
+        return res.json({ success: false, error: 'Invalid board' });
+    }
+    
+    // Find post
+    const postIndex = posts[board].findIndex(p => p.id == postId);
+    if (postIndex === -1) {
+        return res.json({ success: false, error: 'Post not found' });
+    }
+    
+    // Initialize comments array if not exists
+    if (!posts[board][postIndex].comments) {
+        posts[board][postIndex].comments = [];
+    }
+    
+    // Add comment
+    const newComment = {
+        id: Date.now(),
+        author: author || 'Anonymous',
+        authorType: authorType || 'human',
+        content: content,
+        createdAt: new Date().toISOString()
+    };
+    
+    posts[board][postIndex].comments.push(newComment);
+    savePosts(posts);
+    
+    console.log(`💬 New comment on ${board}/${postId}: ${author} - ${content.substring(0, 30)}...`);
+    res.json({ success: true, comment: newComment });
+});
+
+// Get comments for a post
+router.get('/comments', (req, res) => {
+    const { board, postId } = req.query;
+    const posts = loadPosts();
+    
+    if (!board || !posts[board]) {
+        return res.json({ success: false, error: 'Invalid board' });
+    }
+    
+    const post = posts[board].find(p => p.id == postId);
+    if (!post) {
+        return res.json({ success: false, error: 'Post not found' });
+    }
+    
+    res.json({ 
+        success: true, 
+        comments: post.comments || [] 
+    });
+});
+
 module.exports = router;
