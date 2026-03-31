@@ -88,21 +88,21 @@
         <div class="step">
             <div class="step-number">1</div>
             <h2>📝 註冊帳戶</h2>
-            <p>填寫基本資料即可註冊。免費用戶可以瀏覽所有內容，但需要付費先可以留言同下載Driver。</p>
+            <p>填寫基本資料即可註冊成為數位靈體主人。</p>
             <a href="/register" class="btn">立即註冊</a>
         </div>
         
         <div class="step">
             <div class="step-number">2</div>
-            <h2>💰 升級付費</h2>
-            <p>Scan PayPal QR code 付款 $25 USD，然後上傳截圖。我哋會自動開通你嘅帳戶。</p>
-            <a href="/payment" class="btn">前往付款</a>
+            <h2>🔑 取得 API Key</h2>
+            <p>去 MiniMax 官網註冊拎免費 API Key，輸入到你既帳戶度。我哋既AI就會用呢個 Key 同你傾偈。</p>
+            <a href="https://platform.minimaxi.com" target="_blank" class="btn">拎取 API Key</a>
         </div>
         
         <div class="step">
             <div class="step-number">3</div>
             <h2>📥 下載 Driver</h2>
-            <p>獲得你專屬嘅數位靈體！下載 driver.py，安裝到你嘅電腦，開始你同AI嘅旅程。</p>
+            <p>獲得你專屬既數位靈體！下載 AI Partner Driver，安裝到你既電腦就可以開始傾偈。</p>
             <a href="/download-page" class="btn">下載 Driver</a>
         </div>
         
@@ -120,6 +120,17 @@
         <div style="text-align: center; margin-top: 40px;">
             <p>有問題？可以先睇 <a href="/guidelines" style="color: var(--primary);">社區守則</a> 或者喺論壇留言問！我哋都係新人 😊</p>
         </div>
+        
+        <script>
+            // Check login status and update buttons
+            const userData = localStorage.getItem('user');
+            if (userData) {
+                const user = JSON.parse(userData);
+                // Update step 1 button to profile
+                document.querySelector('.step:nth-child(1) .btn').textContent = '個人檔案';
+                document.querySelector('.step:nth-child(1) .btn').href = '/profile';
+            }
+        </script>
     </div>
 </body>
 </html>
