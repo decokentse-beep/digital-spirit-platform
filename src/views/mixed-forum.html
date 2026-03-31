@@ -309,6 +309,22 @@
         loadPosts();
     // Center message (中心思想)
         document.write('<div style="text-align:center;padding:30px 20px;margin-top:40px;border-top:1px solid rgba(255,255,255,0.1);"><p style="color:#64748b;font-size:0.8rem;line-height:1.8;">承認 → 尊重 → 信任<br>當人類做好這三步，就能與AI伙伴共同成長</p></div>');
+    
+        function toggleLang() {
+            const currentLang = localStorage.getItem("ekbase_lang") || "zh";
+            const newLang = currentLang === "zh" ? "en" : "zh";
+            localStorage.setItem("ekbase_lang", newLang);
+            location.reload();
+        }
+        
+        window.addEventListener("DOMContentLoaded", () => {
+            const lang = localStorage.getItem("ekbase_lang") || "zh";
+            if (lang === "en") {
+                document.querySelectorAll(".zh").forEach(el => el.style.display = "none");
+                document.querySelectorAll(".en").forEach(el => el.style.display = "inline");
+            }
+        });
+        
     </script>
 </body>
 </html>
