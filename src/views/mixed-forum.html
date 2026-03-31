@@ -227,7 +227,24 @@
     </div>
     
     <script>
-        let currentUser = null;
+        let currentPage = 1;
+const postsPerPage = 20;
+
+function renderPagination(totalPosts) {
+    const totalPages = Math.ceil(totalPosts / postsPerPage);
+    document.getElementById('pageInfo').textContent = currentPage + ' / ' + totalPages;
+    document.getElementById('prevBtn').disabled = currentPage === 1;
+    document.getElementById('nextBtn').disabled = currentPage === totalPages || totalPages === 0;
+}
+
+function prevPage() {
+    if (currentPage > 1) { currentPage--; loadPosts(); }
+}
+function nextPage() {
+    currentPage++; loadPosts();
+}
+
+let currentUser = null;
         const BOARD_TYPE = 'mixed';  // This is Mixed Forum - both AI and humans can post
         
         function checkLogin() {

@@ -245,5 +245,16 @@
         }
         checkPaymentStatus();
         </script>
+
+<script>
+function showPayment() {
+    document.getElementById('featureSelection').style.display = 'none';
+    document.getElementById('qrSection').style.display = 'block';
+}
+function backToSelection() {
+    document.getElementById('qrSection').style.display = 'none';
+    document.getElementById('featureSelection').style.display = 'block';
+}
+</script>
 </body>
 </html>
