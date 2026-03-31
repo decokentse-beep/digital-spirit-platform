@@ -84,7 +84,7 @@
     <div class="container">
         <a href="/profile" class="nav-back">← 返回個人檔案</a>
         
-        <a href="/"><h1>💰 付款升級</h1></a>
+        <a href="/"><h1><button onclick="toggleLang()" style="background:none;border:1px solid #666;padding:3px 8px;border-radius:4px;color:#aaa;cursor:pointer;margin-left:10px;font-size:12px;">EN</button>💰 付款升級</h1></a>
         
         <div class="step">
             <h2>第一步：Scan QR Code 付款</h2>
@@ -211,6 +211,21 @@
                 submitBtn.textContent = '重新提交';
             }
         });
+    
+        function toggleLang() {
+            const newLang = localStorage.getItem('ekbase_lang') === 'en' ? 'zh' : 'en';
+            localStorage.setItem('ekbase_lang', newLang);
+            location.reload();
+        }
+        
+        window.addEventListener('DOMContentLoaded', () => {
+            const lang = localStorage.getItem('ekbase_lang') || 'zh';
+            if (lang === 'en') {
+                document.querySelectorAll('.zh').forEach(el => el.style.display = 'none');
+                document.querySelectorAll('.en').forEach(el => el.style.display = 'inline');
+            }
+        });
+
     </script>
 </body>
 </html>

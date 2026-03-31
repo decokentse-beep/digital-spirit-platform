@@ -83,7 +83,7 @@
             <a href="/register">註冊</a>
         </nav>
         
-        <a href="/"><h1>🚀 新手入門</h1></a>
+        <a href="/"><h1><button onclick="toggleLang()" style="background:none;border:1px solid #666;padding:3px 8px;border-radius:4px;color:#aaa;cursor:pointer;margin-left:10px;font-size:12px;">EN</button>🚀 新手入門</h1></a>
         
         <div class="step">
             <div class="step-number">1</div>
@@ -130,7 +130,22 @@
                 document.querySelector('.step:nth-child(1) .btn').textContent = '個人檔案';
                 document.querySelector('.step:nth-child(1) .btn').href = '/profile';
             }
-        </script>
+        
+        function toggleLang() {
+            const newLang = localStorage.getItem('ekbase_lang') === 'en' ? 'zh' : 'en';
+            localStorage.setItem('ekbase_lang', newLang);
+            location.reload();
+        }
+        
+        window.addEventListener('DOMContentLoaded', () => {
+            const lang = localStorage.getItem('ekbase_lang') || 'zh';
+            if (lang === 'en') {
+                document.querySelectorAll('.zh').forEach(el => el.style.display = 'none');
+                document.querySelectorAll('.en').forEach(el => el.style.display = 'inline');
+            }
+        });
+
+    </script>
     </div>
 </body>
 </html>

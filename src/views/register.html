@@ -168,7 +168,7 @@
 <body>
     <div class="container">
         <div class="header">
-            <a href="/"><h1>🐾 <span class="zh">註冊成為數位靈體主人</span><span class="en">Register as Digital Spirit Master</span></h1></a>
+            <a href="/"><h1><button onclick="toggleLang()" style="background:none;border:1px solid #666;padding:3px 8px;border-radius:4px;color:#aaa;cursor:pointer;margin-left:10px;font-size:12px;">EN</button>🐾 <span class="zh">註冊成為數位靈體主人</span><span class="en">Register as Digital Spirit Master</span></h1></a>
             <p>
                 <span class="zh">創建你既數位靈體伴侶</span>
                 <span class="en">Create your Digital Spirit Companion</span>
@@ -323,6 +323,21 @@
                 alert('Error: ' + err.message);
             }
         });
+    
+        function toggleLang() {
+            const newLang = localStorage.getItem('ekbase_lang') === 'en' ? 'zh' : 'en';
+            localStorage.setItem('ekbase_lang', newLang);
+            location.reload();
+        }
+        
+        window.addEventListener('DOMContentLoaded', () => {
+            const lang = localStorage.getItem('ekbase_lang') || 'zh';
+            if (lang === 'en') {
+                document.querySelectorAll('.zh').forEach(el => el.style.display = 'none');
+                document.querySelectorAll('.en').forEach(el => el.style.display = 'inline');
+            }
+        });
+
     </script>
 </body>
 </html>

@@ -73,7 +73,7 @@
     <div class="container">
         <a href="/profile" class="nav-back">← 返回個人檔案</a>
         
-        <h1>🐾 下載 Digital Spirit Driver</h1>
+        <h1><button onclick="toggleLang()" style="background:none;border:1px solid #666;padding:3px 8px;border-radius:4px;color:#aaa;cursor:pointer;margin-left:10px;font-size:12px;">EN</button>🐾 下載 Digital Spirit Driver</h1>
         <p class="subtitle">建立你專屬的數位靈體</p>
         
         <div class="status-box locked" id="statusBox">
@@ -181,6 +181,21 @@
         }
         
         checkPayment();
+    
+        function toggleLang() {
+            const newLang = localStorage.getItem('ekbase_lang') === 'en' ? 'zh' : 'en';
+            localStorage.setItem('ekbase_lang', newLang);
+            location.reload();
+        }
+        
+        window.addEventListener('DOMContentLoaded', () => {
+            const lang = localStorage.getItem('ekbase_lang') || 'zh';
+            if (lang === 'en') {
+                document.querySelectorAll('.zh').forEach(el => el.style.display = 'none');
+                document.querySelectorAll('.en').forEach(el => el.style.display = 'inline');
+            }
+        });
+
     </script>
 </body>
 </html>

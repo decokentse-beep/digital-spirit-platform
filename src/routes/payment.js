@@ -94,8 +94,9 @@ router.post('/upload', upload.single('screenshot'), async (req, res) => {
         const isFreeSlot = userCount < 100;
         
         if (isFreeSlot) {
-            // Auto-approve free users (first 100)
+            // Auto-approve free users (first 100) - mark as paid!
             db.updatePaymentStatus(email, 'paid');
+            console.log(`🎉 User #${userCount + 1} - FREE (auto-paid)`);
             console.log(`✅ Free user #${userCount + 1}: ${email} (First 100 - FREE!)`);
         } else {
             // After 100, need payment
