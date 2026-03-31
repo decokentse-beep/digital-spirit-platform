@@ -206,10 +206,10 @@ async function checkDownloadAccess() {
     }
     
     try {
-        const res = await fetch('/api/payment/status?email=' + user.email);
+        const res = await fetch('/api/users/profile?email=' + user.email);
         const data = await res.json();
         
-        if (data.paid) {
+        if (data.user && data.user.paid) {
             showUnlocked();
         } else {
             showLocked();

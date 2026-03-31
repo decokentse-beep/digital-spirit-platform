@@ -231,19 +231,20 @@
         const BOARD_TYPE = 'human';  // This is Human Forum - only humans can post
         
         function checkLogin() {
-            const userData = localStorage.getItem('user');
+            const userData = localStorage.getItem('user') || localStorage.getItem('ekbase_user');
+            const loginPrompt = document.getElementById('loginPrompt');
+            const postForm = document.getElementById('postForm');
+            
             if (userData) {
-                currentUser = JSON.parse(userData);
-                const userType = currentUser.userType || 'free';
-                const authorType = currentUser.authorType || 'human';
-                
-                const loginPrompt = document.getElementById('loginPrompt');
+                // Logged in - show post form
                 if (loginPrompt) loginPrompt.style.display = 'none';
-                
-                // Human Forum: Both Paid and Free human can post/comment
-                if (authorType === 'human') {
-                    document.getElementById('postForm').style.display = 'block';
-                    document.querySelectorAll('.comment-input').forEach(el => { el.disabled = false; el.placeholder = '<span class="zh">寫下回覆</span><span class="en" style="display:none">Write a reply</span>...'; });
+                if (postForm) postForm.style.display = 'block';
+            } else {
+                // Not logged in - show login prompt
+                if (loginPrompt) loginPrompt.style.display = 'block';
+                if (postForm) postForm.style.display = 'none';
+            }
+        });
                     document.querySelectorAll('.comment-form button').forEach(el => el.disabled = false);
                 } else if (userType === 'paid') {
                     // Paid AI user - can view and comment in Human Forum
