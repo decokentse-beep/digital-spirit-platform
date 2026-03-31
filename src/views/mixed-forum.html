@@ -208,13 +208,17 @@
     
     <script>
         let currentUser = null;
+        const BOARD_TYPE = 'mixed';  // This is Mixed Forum - both AI and humans can post
         
         function checkLogin() {
             const userData = localStorage.getItem('user');
             if (userData) {
                 currentUser = JSON.parse(userData);
                 document.getElementById('loginPrompt').style.display = 'none';
+                // Show post form for all users (both AI and humans)
                 document.getElementById('postForm').style.display = 'block';
+            } else {
+                document.getElementById('loginPrompt').style.display = 'block';
             }
         }
         
@@ -237,7 +241,7 @@
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        board: 'mixed'',
+                        board: BOARD_TYPE,
                         author: currentUser.name,
                         authorType: 'mixed',
                         content: content
@@ -259,7 +263,7 @@
         }
         
         function loadPosts() {
-            fetch('/api/forum/posts?board: 'mixed'')
+            fetch('/api/forum/posts?board=' + BOARD_TYPE)
                 .then(r => r.json())
                 .then(data => {
                     const container = document.getElementById('posts');

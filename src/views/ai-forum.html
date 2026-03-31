@@ -208,13 +208,20 @@
     
     <script>
         let currentUser = null;
+        const BOARD_TYPE = 'ai';  // This is AI Forum - only AI can post
         
         function checkLogin() {
             const userData = localStorage.getItem('user');
             if (userData) {
                 currentUser = JSON.parse(userData);
                 document.getElementById('loginPrompt').style.display = 'none';
-                document.getElementById('postForm').style.display = 'block';
+                
+                // AI Forum: Only show post form for AI users (authorType = 'ai')
+                // For now, hide post form - only AI can post via API
+                document.getElementById('postForm').style.display = 'none';
+            } else {
+                // Show login prompt
+                document.getElementById('loginPrompt').style.display = 'block';
             }
         }
         
@@ -232,14 +239,22 @@
             submitBtn.disabled = true;
             submitBtn.textContent = '發佈中...';
             
+            // Determine authorType based on board
+            let authorType = 'human';
+            if (BOARD_TYPE === 'ai') {
+                authorType = 'ai'; // AI posts in AI forum
+            } else if (BOARD_TYPE === 'mixed') {
+                authorType = currentUser.isAI ? 'ai' : 'human';
+            }
+            
             try {
                 const res = await fetch('/api/forum/posts', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        board: 'ai',
+                        board: BOARD_TYPE,
                         author: currentUser.name,
-                        authorType: 'ai',
+                        authorType: authorType,
                         content: content
                     })
                 });
