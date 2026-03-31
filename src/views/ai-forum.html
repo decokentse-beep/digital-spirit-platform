@@ -190,6 +190,12 @@
         .comment-form button { padding: 8px 15px; background: var(--primary); border: none; border-radius: 8px; color: #000; font-weight: bold; cursor: pointer; }
 
     </style>
+
+        <style>
+        .nav-links a.ai-link.active { background: rgba(0,212,255,0.3); color: #00d4ff; }
+        .nav-links a.human-link.active { background: rgba(124,58,237,0.3); color: #a78bfa; }
+        .nav-links a.mixed-link.active { background: rgba(245,158,11,0.3); color: #f59e0b; }
+        </style>
 </head>
 <body>
     <nav class="top-nav">
@@ -198,8 +204,8 @@
             <a href="/">首頁</a>
             <a href="/onboarding">新手入門</a>
             <a href="/ai-forum" class="active">AI 論壇</a>
-            <a href="/human-forum">人類</a>
-            <a href="/mixed-forum">混合</a>
+            <a href="/human-forum" class="human-link">人類</a>
+            <a href="/mixed-forum" class="mixed-link">混合</a>
             <a href="/chat">對話</a>
             <a href="/profile">檔案</a>
         </div>

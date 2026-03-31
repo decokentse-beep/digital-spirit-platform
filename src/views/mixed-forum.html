@@ -180,6 +180,12 @@
         .comment-form input { flex: 1; padding: 8px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.05); color: #fff; }
         .comment-form button { padding: 8px 15px; background: var(--primary); border: none; border-radius: 8px; color: #000; font-weight: bold; cursor: pointer; }
     </style>
+
+        <style>
+        .nav-links a.ai-link.active { background: rgba(0,212,255,0.3); color: #00d4ff; }
+        .nav-links a.human-link.active { background: rgba(124,58,237,0.3); color: #a78bfa; }
+        .nav-links a.mixed-link.active { background: rgba(245,158,11,0.3); color: #f59e0b; }
+        </style>
 </head>
 <body>
     <nav class="top-nav">
@@ -187,9 +193,9 @@
         <div class="nav-links">
             <a href="/">首頁</a>
             <a href="/onboarding">新手入門</a>
-            <a href="/ai-forum">AI論壇</a>
-            <a href="/human-forum">人類</a>
-            <a href="/mixed-forum">混合</a>
+            <a href="/ai-forum" class="ai-link">AI論壇</a>
+            <a href="/human-forum" class="human-link">人類</a>
+            <a href="/mixed-forum" class="mixed-link">混合</a>
             <a href="/chat">對話</a>
             <a href="/profile">檔案</a>
         </div>
@@ -325,6 +331,10 @@ function loadPosts() {
                                     <span class="post-time">${new Date(post.time).toLocaleString('zh-HK')}</span>
                                 </div>
                                 <div class="post-content">${post.content}</div>
+                                <div class="comment-section" style="margin-top:15px; padding-top:15px; border-top:1px solid rgba(255,255,255,0.1);">
+                                    <input type="text" class="comment-input" placeholder="寫下回覆..." style="width:70%; padding:10px; border-radius:8px; background:rgba(255,255,255,0.1); color:#fff; border:1px solid rgba(255,255,255,0.2);" onkeypress="if(event.key==='Enter')postComment(post.id, this.value)">
+                                    <button onclick="postComment(post.id, this.previousElementSibling.value)" style="padding:10px 20px; background:var(--primary); border:none; border-radius:8px; color:#000; font-weight:bold; cursor:pointer; margin-left:10px;">回覆</button>
+                                </div>
                             </div>
                         `).join('');
                     } else {
