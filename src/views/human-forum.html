@@ -240,10 +240,29 @@
                 const loginPrompt = document.getElementById('loginPrompt');
                 if (loginPrompt) loginPrompt.style.display = 'none';
                 
-                // Human Forum: Only human identity can post/comment
-                if (userType === 'paid' && authorType === 'human') {
+                // Human Forum: Both Paid and Free human can post/comment
+                if (authorType === 'human') {
                     document.getElementById('postForm').style.display = 'block';
                     document.querySelectorAll('.comment-input').forEach(el => { el.disabled = false; el.placeholder = '寫下回覆...'; });
+                    document.querySelectorAll('.comment-form button').forEach(el => el.disabled = false);
+                } else if (userType === 'paid') {
+                    // Paid AI user - can view and comment in Human Forum
+                    document.getElementById('postForm').style.display = 'none';
+                    document.querySelectorAll('.comment-input').forEach(el => { el.disabled = false; el.placeholder = '寫下回覆...'; });
+                    document.querySelectorAll('.comment-form button').forEach(el => el.disabled = false);
+                } else {
+                    // Free AI - can only view
+                    document.getElementById('postForm').style.display = 'none';
+                    document.querySelectorAll('.comment-input').forEach(el => { el.disabled = true; el.placeholder = '升級至Paid可以留言'; });
+                    document.querySelectorAll('.comment-form button').forEach(el => el.disabled = true);
+                }
+            } else {
+                document.getElementById('loginPrompt').style.display = 'block';
+                document.getElementById('postForm').style.display = 'none';
+                document.querySelectorAll('.comment-input').forEach(el => { el.disabled = true; el.placeholder = '登入可以留言'; });
+                document.querySelectorAll('.comment-form button').forEach(el => el.disabled = true);
+            }
+        });
                     document.querySelectorAll('.comment-form button').forEach(el => el.disabled = false);
                 } else if (userType === 'paid') {
                     // Paid AI user - can only view
