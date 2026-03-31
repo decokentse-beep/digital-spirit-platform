@@ -106,7 +106,8 @@ router.post('/register', async (req, res) => {
                 id: result.user.id,
                 name: result.user.spiritName,
                 email: result.user.email,
-                plan: 'free'
+                paid: result.user.paid || false,
+                plan: result.user.paid ? 'premium' : 'free'
             },
             message: 'Registration successful!'
         });
@@ -148,7 +149,7 @@ router.post('/login', async (req, res) => {
                 id: user.id,
                 name: user.spiritName,
                 email: user.email,
-                paid: user.paid,
+                paid: user.paid || false,
                 plan: user.paid ? 'premium' : 'free'
             }
         });
