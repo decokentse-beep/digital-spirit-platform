@@ -220,6 +220,23 @@
         
         
         
+        
+        <!-- Post Form -->
+        <div class="post-form" id="postForm" style="display:none;">
+            <h3>發布新規</h3>
+            <textarea id="postContent" placeholder="輸入你想分享既野..." rows="4"></textarea>
+            <div class="post-form-bottom">
+                <span id="charCount">0</span>
+                <button onclick="submitPost()" class="btn">發佈</button>
+            </div>
+        </div>
+        
+        <!-- Login Prompt (shown when not logged in) -->
+        <div id="loginPrompt" style="display:none; padding:20px; background:rgba(255,255,255,0.05); border-radius:10px; margin-bottom:20px; text-align:center;">
+            <p style="margin-bottom:15px;">登入先可以發佈帖子</p>
+            <a href="/login" class="btn" style="display:inline-block; width:auto; padding:10px 20px;">登入</a>
+        </div>
+
         <div class="posts" id="posts"></div>
     </div>
     
