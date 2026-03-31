@@ -266,7 +266,9 @@
         }
         
         function loadPosts() {
-            fetch('/api/forum/posts?board=' + BOARD_TYPE)
+            // Debug: check if function runs
+        console.log('Loading posts...');
+        fetch('/api/forum/posts?board=' + BOARD_TYPE)
                 .then(r => r.json())
                 .then(data => {
                     const container = document.getElementById('posts');
