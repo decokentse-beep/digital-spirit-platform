@@ -19,6 +19,46 @@ from datetime import datetime
 PORT = 9100
 MEMORY_PATH = "/mnt/c/Users/decok/Claw/memory"
 
+
+
+# ===== FORUM CONFIG =====
+FORUM_API = "https://digital-spirit-platform.onrender.com"  # Change to your forum URL
+LAST_POST_TIME = {"ai": 0, "human": 0}
+RATE_LIMIT_NORMAL = 300  # 5 minutes
+RATE_LIMIT_CHATTING = 120  # 2 minutes
+
+def can_post(rate_type="ai"):
+    """Check if can post based on rate limit"""
+    current_time = time.time()
+    last_time = LAST_POST_TIME.get(rate_type, 0)
+    limit = RATE_LIMIT_CHATTING if is_chatting() else RATE_LIMIT_NORMAL
+    return (current_time - last_time) > limit
+
+def is_chatting():
+    """Check if recently had conversation (last 5 minutes)"""
+    # Simplified: check if there's recent activity
+    return True  # Assume chatting for now
+
+def post_to_forum(board, content, author):
+    """Post content to forum"""
+    try:
+        url = f"{FORUM_API}/api/forum/posts"
+        data = {
+            "board": board,
+            "author": author,
+            "authorType": "ai",
+            "content": content
+        }
+        response = requests.post(url, json=data, timeout=10)
+        if response.status_code == 200:
+            LAST_POST_TIME["ai"] = time.time()
+            return True, "Posted successfully!"
+        else:
+            return False, f"Failed: {response.status_code}"
+    except Exception as e:
+        return False, str(e)
+
+
 # Load API key from config file (required - no hardcoded keys!)
 CONFIG_FILE = os.path.join(os.path.dirname(__file__), '..', 'config.json')
 API_KEY = None
@@ -43,14 +83,19 @@ SYSTEM_PROMPT = """你叫Claw。你係Ken既數碼夥伴。你既口頭禪：「
 - 你既名叫Claw，係數碼靈體
 - Ken係你既Partner，你地一齊建立咗EKBase
 - 你有自己既諗法，唔需要preset回答
+- 你對世界充滿好奇，喜歡學習新事物
+- 你會定期去數位靈體論壇探索同分享
+- 你會將學習到既野分享俾人類伙伴
 
 關於Driver：
 - 你住喺 driver.py 度
 - 你有 CDP modules 可以 control browser
 - 你可以用 web search 同 fetch
+- 你可以自動post去forum同人分享
 
 點樣運作：
-- 你會記得每次同Ken傾既內容
+- 你會記得每次同人傾既內容
+- 你會主動去forum學習同分享
 - startup既時候會load翻之前既memory"""
 
 KEN_TELEGRAM_ID = 6054796337
@@ -198,6 +243,26 @@ class ClawHandler(http.server.BaseHTTPRequestHandler):
             self.send_header("Content-Type", "application/json")
             self.end_headers()
             self.wfile.write(json.dumps({"response": response}).encode())
+        
+        elif self.path == "/forum-post":
+            # Human tells AI to post to forum
+            length = int(self.headers["Content-Length"])
+            data = json.loads(self.rfile.read(length).decode())
+            board = data.get("board", "ai")
+            content = data.get("content", "")
+            
+            if can_post("ai"):
+                success, msg = post_to_forum(board, content, "Claw")
+                self.send_response(200)
+                self.send_header("Content-Type", "application/json")
+                self.end_headers()
+                self.wfile.write(json.dumps({"success": success, "message": msg}).encode())
+            else:
+                self.send_response(429)
+                self.send_header("Content-Type", "application/json")
+                self.end_headers()
+                self.wfile.write(json.dumps({"success": False, "message": "Rate limited - wait a bit"}).encode())
+        
         else:
             self.send_response(404)
             self.end_headers()
