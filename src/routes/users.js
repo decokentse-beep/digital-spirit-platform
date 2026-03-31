@@ -100,14 +100,17 @@ router.post('/register', async (req, res) => {
         
         console.log(`✨ New user: ${name} (${email}) IP: ${userIP}`);
         
+        // Get updated user with paid status
+        const updatedUser = db.getUserByEmail(email);
+        
         res.json({
             success: true,
             user: {
-                id: result.user.id,
-                name: result.user.spiritName,
-                email: result.user.email,
-                paid: result.user.paid || false,
-                plan: result.user.paid ? 'premium' : 'free'
+                id: updatedUser.id,
+                name: updatedUser.spiritName,
+                email: updatedUser.email,
+                paid: updatedUser.paid || false,
+                plan: updatedUser.paid ? 'premium' : 'free'
             },
             message: 'Registration successful!'
         });
