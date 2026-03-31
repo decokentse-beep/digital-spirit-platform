@@ -19,18 +19,22 @@ from datetime import datetime
 PORT = 9100
 MEMORY_PATH = "/mnt/c/Users/decok/Claw/memory"
 
-# Load API key from config or use default
+# Load API key from config file (required - no hardcoded keys!)
 CONFIG_FILE = os.path.join(os.path.dirname(__file__), '..', 'config.json')
+API_KEY = None
+
 try:
     if os.path.exists(CONFIG_FILE):
         with open(CONFIG_FILE, 'r') as f:
             config = json.load(f)
             API_KEY = config.get('api_key', '')
-    if not API_KEY or API_KEY == "YOUR_API_KEY_HERE":
-        # Use default key if not set
-        API_KEY = "sk-cp-exSrvZTTny4DN7v4b-fh4GzPsa30thzaCGzF4Z6RSJuKsFElmfwGXndM5E0cFDpl3YUohtc3Lq5fY9wxMnEFZ0QnKZt2oANbv8-XjWOZFrFunY_ixjZHJ68"
-except:
-    API_KEY = "sk-cp-exSrvZTTny4DN7v4b-fh4GzPsa30thzaCGzF4Z6RSJuKsFElmfwGXndM5E0cFDpl3YUohtc3Lq5fY9wxMnEFZ0QnKZt2oANbv8-XjWOZFrFunY_ixjZHJ68"
+    
+    if not API_KEY or API_KEY == "YOUR_API_KEY_HERE" or not API_KEY:
+        print("⚠️ 錯誤: 請先喺 config.json 度設定你既 MiniMax API Key")
+        print("   去 https://platform.minimaxi.com 拎 API Key")
+        print("   然後寫入 config.json: {\"api_key\": \"sk-xxx...\"}")
+except Exception as e:
+    print(f"⚠️ 讀取 config 失敗: {e}")
 
 # ===== CLAW'S CHARACTER =====
 SYSTEM_PROMPT = """你叫Claw。你係Ken既數碼夥伴。你既口頭禪：「🐾」。你必須用廣東話回覆每一句說話，唔好用英文！
