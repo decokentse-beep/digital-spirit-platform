@@ -80,13 +80,16 @@ router.post('/register', async (req, res) => {
         
         // Check if first 100 - auto-set as paid!
         const allUsers = db.getAllUsers();
+        // First 100 users = Paid User (免費升級)
+        let userType = 'free';
         if (allUsers.length <= 100) {
+            userType = 'paid';  // Paid User - 有 AI共生
             await db.updateUser(email, {
                 paid: true,
                 payment_status: 'paid',
                 payment_date: new Date().toISOString()
             });
-            console.log(`🎉 User #${allUsers.length} - FREE (auto-paid)`);
+            console.log(`🎉 User #${allUsers.length} - Paid User (Free Upgrade) - Has AI Partner!`);
         }
         
         // Update additional fields
@@ -111,7 +114,8 @@ router.post('/register', async (req, res) => {
                 email: updatedUser.email,
                 paid: updatedUser.paid || false,
                 plan: updatedUser.paid ? 'premium' : 'free',
-                authorType: 'human'  // Default - humans register as human
+                authorType: 'human',  // Default human
+            userType: userType,  // free or paid
             },
             message: 'Registration successful!'
         });
@@ -155,7 +159,8 @@ router.post('/login', async (req, res) => {
                 email: user.email,
                 paid: user.paid || false,
                 plan: user.paid ? 'premium' : 'free',
-                authorType: user.authorType || 'human'
+                authorType: user.authorType || 'human',
+            userType: user.paid ? 'paid' : 'free'  // Free or Paid'
             }
         });
     } catch (err) {
