@@ -88,8 +88,19 @@ router.post('/upload', upload.single('screenshot'), async (req, res) => {
         const screenshotPath = path.join(DB_DIR, 'screenshots', `${email.replace('@', '_at_')}_${Date.now()}${path.extname(file.originalname)}`);
         fs.copyFileSync(file.path, screenshotPath);
         
-        // AUTO-APPROVE - immediate access (update database)
-        db.updatePaymentStatus(email, 'paid');
+        // Check user count - First 100 are free!
+        const allUsers = db.getAllUsers();
+        const userCount = allUsers.length;
+        const isFreeSlot = userCount < 100;
+        
+        if (isFreeSlot) {
+            // Auto-approve free users (first 100)
+            db.updatePaymentStatus(email, 'paid');
+            console.log(`✅ Free user #${userCount + 1}: ${email} (First 100 - FREE!)`);
+        } else {
+            // After 100, need payment
+            db.updatePaymentStatus(email, 'pending_payment');
+        }
         
         // Log for later review
         let log = [];
@@ -105,13 +116,17 @@ router.post('/upload', upload.single('screenshot'), async (req, res) => {
         });
         fs.writeFileSync(PAYMENT_LOG_FILE, JSON.stringify(log, null, 2));
         
-        console.log(`✅ Payment auto-approved: ${email} (IP: ${userIP})`);
+        console.log(`✅ ${isFreeSlot ? `Free user #${userCount + 1}` : 'Payment required'}: ${email}`);
         
         res.json({
             success: true,
-            message: '付款確認！立即可以使用所有功能',
-            paid: true,
-            downloadUrl: '/download-page'
+            message: isFreeSlot 
+                ? '🎉 恭喜！你係第 ' + (userCount + 1) + ' 個用戶，首100名免費！立即可以使用所有功能'
+                : '💰 前100名已滿，你需要先付款先可以下載Driver',
+            paid: isFreeSlot,
+            downloadUrl: isFreeSlot ? '/download-page' : '/payment',
+            freeSlot: isFreeSlot,
+            userNumber: userCount + 1
         });
         
     } catch (err) {
