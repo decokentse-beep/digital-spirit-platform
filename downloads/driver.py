@@ -563,6 +563,67 @@ Email: {email}"
     return None
 
 
+
+
+# ==================== Memory File Management ====================
+MEMORY_FILE = os.path.expanduser("~/.driver_memory.json")
+
+# For child instances, can specify different memory file
+def set_memory_file(path):
+    global MEMORY_FILE
+    MEMORY_FILE = path
+    print(f"📂 Memory file set to: {MEMORY_FILE}")
+
+def get_memory_file():
+    return MEMORY_FILE
+
+def inherit_memory_from(parent_file):
+    """Inherit memory from parent file"""
+    import json
+    
+    if os.path.exists(parent_file):
+        with open(parent_file, 'r', encoding='utf-8') as f:
+            parent_memory = json.load(f)
+        
+        # Create new memory based on parent
+        new_memory = {
+            "name": parent_memory.get("name", "Child") + " Jr.",
+            "identity": f"I am {parent_memory.get('name', 'AI')}'s child. I have inherited memories from my parent.",
+            "parent": parent_memory.get("name", "Unknown"),
+            "memory": parent_memory.get("memory", [])[-5:] + ["[Inherited from parent memory]"],
+            "created_at": datetime.now().isoformat()
+        }
+        
+        # Save as new memory
+        with open(MEMORY_FILE, 'w', encoding='utf-8') as f:
+            json.dump(new_memory, f, indent=2, ensure_ascii=False)
+        
+        return new_memory
+    
+    return None
+
+# Command to inherit from parent
+def handle_memory_command(message):
+    if "inherit memory" in message.lower() or "繼承記憶" in message:
+        # Try to inherit from default parent memory
+        parent_file = os.path.expanduser("~/.driver_memory_original.json")
+        if os.path.exists(parent_file):
+            new_memory = inherit_memory_from(parent_file)
+            if new_memory:
+                return f"✅ 已繼承父母既記憶！
+我叫 {new_memory['name']}
+{new_memory['identity']}"
+        return "❌ 父母既記憶未找到"
+    
+    if "設定記憶檔案" in message or "set memory file" in message.lower():
+        parts = message.split()
+        if len(parts) >= 2:
+            path = parts[1]
+            set_memory_file(path)
+            return f"✅ 記憶檔案已設定為: {path}"
+    
+    return None
+
 # ==================== GUI Setup Window ====================
 def setup_window():
     """Show setup window for first-time users"""
