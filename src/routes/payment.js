@@ -8,9 +8,11 @@ const router = express.Router();
 const fs = require('fs');
 const path = require('path');
 const multer = require('multer');
+const db = require('../services/database');
 
-// Blocklist for fraud prevention
-const BLOCKLIST_FILE = 'C:/Users/decok/Claw/payments/blocklist.json';
+const DB_DIR = path.join(__dirname, '..', '..', 'database');
+const BLOCKLIST_FILE = path.join(DB_DIR, 'blocklist.json');
+const PAYMENT_LOG_FILE = path.join(DB_DIR, 'payment_log.json');
 
 // Load or create blocklist
 function loadBlocklist() {
@@ -21,6 +23,9 @@ function loadBlocklist() {
 }
 
 function saveBlocklist(blocklist) {
+    if (!fs.existsSync(DB_DIR)) {
+        fs.mkdirSync(DB_DIR, { recursive: true });
+    }
     fs.writeFileSync(BLOCKLIST_FILE, JSON.stringify(blocklist, null, 2));
 }
 
@@ -34,7 +39,7 @@ function isBlocked(email, ip) {
 // Multer config
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-        const queueDir = 'C:/Users/decok/Claw/payments/screenshot_queue';
+        const queueDir = path.join(DB_DIR, 'screenshots');
         if (!fs.existsSync(queueDir)) fs.mkdirSync(queueDir, { recursive: true });
         cb(null, queueDir);
     },
@@ -46,8 +51,74 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
-// Upload and auto-approve
+// Upload and auto-approve (using database)
 router.post('/upload', upload.single('screenshot'), async (req, res) => {
+    try {
+        const { email, name } = req.body;
+        const userIP = req.ip || req.connection.remoteAddress || 'unknown';
+        const file = req.file;
+        
+        if (!file) {
+            return res.json({ success: false, error: 'No file uploaded' });
+        }
+        
+        // Check blocklist
+        const blockCheck = isBlocked(email, userIP);
+        if (blockCheck.blocked) {
+            return res.json({ 
+                success: false, 
+                error: 'Account suspended. Please contact support.',
+                blocked: true
+            });
+        }
+        
+        // Check if user exists, if not create
+        let user = db.getUserByEmail(email);
+        
+        if (!user) {
+            // Create new user
+            const result = db.createUser({ email, password: 'temp', spiritName: name || 'New Spirit' });
+            if (!result.success) {
+                return res.json({ success: false, error: result.error });
+            }
+            user = result.user;
+        }
+        
+        // Copy screenshot to database folder
+        const screenshotPath = path.join(DB_DIR, 'screenshots', `${email.replace('@', '_at_')}_${Date.now()}${path.extname(file.originalname)}`);
+        fs.copyFileSync(file.path, screenshotPath);
+        
+        // AUTO-APPROVE - immediate access (update database)
+        db.updatePaymentStatus(email, 'paid');
+        
+        // Log for later review
+        let log = [];
+        if (fs.existsSync(PAYMENT_LOG_FILE)) {
+            log = JSON.parse(fs.readFileSync(PAYMENT_LOG_FILE, 'utf8'));
+        }
+        log.push({
+            email,
+            ip: userIP,
+            screenshot: path.basename(screenshotPath),
+            timestamp: new Date().toISOString(),
+            autoApproved: true
+        });
+        fs.writeFileSync(PAYMENT_LOG_FILE, JSON.stringify(log, null, 2));
+        
+        console.log(`✅ Payment auto-approved: ${email} (IP: ${userIP})`);
+        
+        res.json({
+            success: true,
+            message: '付款確認！立即可以使用所有功能',
+            paid: true,
+            downloadUrl: '/download-page'
+        });
+        
+    } catch (err) {
+        console.error('Payment error:', err);
+        res.json({ success: false, error: 'Upload failed' });
+    }
+});
     try {
         const { email, name } = req.body;
         const userIP = req.ip || req.connection.remoteAddress || 'unknown';
@@ -125,9 +196,9 @@ router.post('/upload', upload.single('screenshot'), async (req, res) => {
     }
 });
 
-// Report fraud (for admin review)
+// Report fraud (for admin review) - using database
 router.post('/report-fraud', (req, res) => {
-    const { email, reason, screenshot } = req.body;
+    const { email, reason } = req.body;
     
     const blocklist = loadBlocklist();
     
@@ -143,16 +214,13 @@ router.post('/report-fraud', (req, res) => {
     
     saveBlocklist(blocklist);
     
-    // Update customer status
-    const customerDir = `C:/Users/decok/Claw/customers/${email.replace('@', '_at_')}`;
-    const infoPath = path.join(customerDir, 'info.json');
-    
-    if (fs.existsSync(infoPath)) {
-        const info = JSON.parse(fs.readFileSync(infoPath, 'utf8'));
-        info.status = 'blocked';
-        info.blocked_reason = reason;
-        info.blocked_at = new Date().toISOString();
-        fs.writeFileSync(infoPath, JSON.stringify(info, null, 2));
+    // Update user status in database
+    if (email) {
+        db.updateUser(email, { 
+            status: 'blocked',
+            blocked_reason: reason,
+            blocked_at: new Date().toISOString()
+        });
     }
     
     console.log(`🚫 Fraud reported: ${email} - ${reason}`);
@@ -173,30 +241,27 @@ router.get('/blocked', (req, res) => {
     });
 });
 
-// Get payment status
+// Get payment status (using database)
 router.get('/status', (req, res) => {
     const { email } = req.query;
     if (!email) return res.json({ success: false, error: 'Email required' });
     
-    const customerDir = `C:/Users/decok/Claw/customers/${email.replace('@', '_at_')}`;
-    const infoPath = path.join(customerDir, 'info.json');
+    const user = db.getUserByEmail(email);
     
-    if (!fs.existsSync(infoPath)) {
+    if (!user) {
         return res.json({ success: true, status: 'not_found', paid: false });
     }
     
-    const info = JSON.parse(fs.readFileSync(infoPath, 'utf8'));
-    
     // Check if blocked
-    const blockCheck = isBlocked(email, info.ip);
+    const blockCheck = isBlocked(email, user.ip);
     if (blockCheck.blocked) {
         return res.json({ success: true, status: 'blocked', paid: false });
     }
     
     res.json({
         success: true,
-        paid: info.paid || false,
-        status: info.payment_status || 'unknown'
+        paid: user.paid || false,
+        status: user.payment_status || 'unknown'
     });
 });
 

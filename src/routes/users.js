@@ -1,6 +1,6 @@
 /**
  * User Registration with IP Tracking & Blocklist
- * 密碼現在使用環境變數
+ * 使用數據庫
  */
 
 const express = require('express');
@@ -8,10 +8,10 @@ const router = express.Router();
 const { v4: uuidv4 } = require('uuid');
 const fs = require('fs');
 const path = require('path');
+const db = require('../services/database');
 
-const users = new Map();
-const betaCodes = new Map();
-const BLOCKLIST_FILE = 'C:/Users/decok/Claw/payments/blocklist.json';
+const DB_DIR = path.join(__dirname, '..', '..', 'database');
+const BLOCKLIST_FILE = path.join(DB_DIR, 'blocklist.json');
 
 // Claw's password from environment (not hardcoded!)
 const CLAW_PASSWORD = process.env.CLAW_PASSWORD || 'MGI0YmY3MjU2ZTQ4NDY5';
@@ -29,38 +29,48 @@ function isBlocked(email, ip) {
     return blocklist.emails.includes(email) || (ip && blocklist.ips.includes(ip));
 }
 
-// Generate beta codes
-for (let i = 1; i <= 100; i++) {
-    const code = `BETA${i.toString().padStart(3, '0')}`;
-    betaCodes.set(code, { used: false, usedBy: null, usedAt: null });
+// Initialize users from database
+function initUsers() {
+    const dbUsers = db.getAllUsers();
+    const usersMap = new Map();
+    
+    // Add pre-created users
+    const preUsers = [
+        {
+            id: 'claw-001', 
+            name: 'Claw', 
+            email: 'claw@ekbase.gt.tc', 
+            password: CLAW_PASSWORD,
+            betaCode: 'BETA000',
+            registeredAt: new Date().toISOString(),
+            plan: 'ai'
+        },
+        { 
+            id: uuidv4(), 
+            name: 'Ken', 
+            email: 'decokentse@gmail.com', 
+            password: 'kT67608962',
+            betaCode: 'BETA001',
+            registeredAt: new Date().toISOString(),
+            plan: 'founder'
+        }
+    ];
+    
+    // Check if users exist in database, if not add them
+    preUsers.forEach(u => {
+        const existing = db.getUserByEmail(u.email);
+        if (!existing) {
+            db.createUser({
+                email: u.email,
+                password: u.password,
+                spiritName: u.name
+            });
+        }
+    });
 }
 
-// Pre-created users - Claw uses env variable for password!
-const preUsers = [
-    {
-        id: 'claw-001', 
-        name: 'Claw', 
-        email: 'claw@ekbase.gt.tc', 
-        password: CLAW_PASSWORD,
-        betaCode: 'BETA000',
-        registeredAt: new Date().toISOString(),
-        plan: 'ai'
-    },
-    { 
-        id: uuidv4(), 
-        name: 'Ken', 
-        email: 'decokentse@gmail.com', 
-        password: 'kT67608962',
-        betaCode: 'BETA001',
-        registeredAt: new Date().toISOString(),
-        plan: 'founder'
-    }
-];
-
-preUsers.forEach(u => {
-    users.set(u.id, u);
-    betaCodes.set(u.betaCode, { used: true, usedBy: u.email, usedAt: new Date().toISOString() });
-});
+// Initialize on load
+initUsers();
 
 // Register
 router.post('/register', (req, res) => {
