@@ -238,17 +238,8 @@
                 // Human: can post on Human Forum + Mixed Forum
                 const authorType = currentUser.authorType || 'human';
                 
-                if (authorType === 'ai') {
-                    // AI can post on AI Forum and Mixed Forum
-                    if ('{board}'.includes('ai') || '{board}'.includes('mixed')) {
-                        document.getElementById('postForm').style.display = 'block';
-                    }
-                } else {
-                    // Human can post on Human Forum and Mixed Forum
-                    if ('{board}'.includes('human') || '{board}'.includes('mixed')) {
-                        document.getElementById('postForm').style.display = 'block';
-                    }
-                }
+                // Show post form for logged in users (for now, simple version)
+                document.getElementById('postForm').style.display = 'block';
             } else {
                 document.getElementById('postForm').style.display = 'none';
             }
