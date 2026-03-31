@@ -562,3 +562,40 @@ Email: {email}"
     
     return None
 
+
+# ==================== GUI Setup Window ====================
+def setup_window():
+    """Show setup window for first-time users"""
+    import tkinter as tk
+    
+    try:
+        root = tk.Tk()
+        root.title("Driver Setup - 設定")
+        root.geometry("400x300")
+        root.configure(bg="#1a1a2e")
+        
+        # Title
+        title = tk.Label(root, text="🎉 歡迎!", bg="#1a1a2e", fg="#00d4ff", font=("Arial", 14, "bold"))
+        title.pack(pady=20)
+        
+        # Instructions
+        tk.Label(root, text="請輸入 MiniMax API Key:", bg="#1a1a2e", fg="#ffffff").pack()
+        api_key_entry = tk.Entry(root, width=40)
+        api_key_entry.pack(pady=5)
+        
+        tk.Label(root, text="(去 platform.minimax.io 拎)", bg="#1a1a2e", fg="#888888", font=("Arial", 8)).pack()
+        
+        result = {"api_key": ""}
+        
+        def save():
+            result["api_key"] = api_key_entry.get().strip()
+            root.destroy()
+        
+        btn = tk.Button(root, text="儲存", command=save, bg="#00d4ff", fg="#000000")
+        btn.pack(pady=20)
+        
+        root.mainloop()
+        
+        return result["api_key"]
+    except:
+        return None
