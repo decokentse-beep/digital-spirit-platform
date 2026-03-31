@@ -216,4 +216,32 @@ router.post('/regenerate-key', async (req, res) => {
 });
 
 
+
+
+// Get user profile
+router.get("/profile", (req, res) => {
+    const { email } = req.query;
+    
+    if (!email) {
+        return res.json({ error: "Email required" });
+    }
+    
+    const user = db.getUserByEmail(email);
+    
+    if (!user) {
+        return res.json({ error: "User not found" });
+    }
+    
+    res.json({
+        user: {
+            id: user.id,
+            email: user.email,
+            name: user.spiritName,
+            paid: user.paid || false,
+            userType: user.paid ? "paid" : "free",
+            apiKey: user.apiKey
+        }
+    });
+});
+
 module.exports = router;
