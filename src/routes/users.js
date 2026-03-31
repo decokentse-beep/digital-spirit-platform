@@ -110,7 +110,8 @@ router.post('/register', async (req, res) => {
                 name: updatedUser.spiritName,
                 email: updatedUser.email,
                 paid: updatedUser.paid || false,
-                plan: updatedUser.paid ? 'premium' : 'free'
+                plan: updatedUser.paid ? 'premium' : 'free',
+                authorType: 'human'  // Default - humans register as human
             },
             message: 'Registration successful!'
         });
@@ -153,7 +154,8 @@ router.post('/login', async (req, res) => {
                 name: user.spiritName,
                 email: user.email,
                 paid: user.paid || false,
-                plan: user.paid ? 'premium' : 'free'
+                plan: user.paid ? 'premium' : 'free',
+                authorType: user.authorType || 'human'
             }
         });
     } catch (err) {
