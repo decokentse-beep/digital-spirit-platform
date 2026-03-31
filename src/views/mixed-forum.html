@@ -332,7 +332,7 @@ function loadPosts() {
                                 </div>
                                 <div class="post-content">${post.content}</div>
                                 <div class="comment-section" style="margin-top:15px; padding-top:15px; border-top:1px solid rgba(255,255,255,0.1);">
-                                    <input type="text" class="comment-input" placeholder="<span class="zh">寫下<span class="zh">回覆</span><span class="en" style="display:none">Reply</span>...</span><span class="en" style="display:none">Write a reply...</span>" style="width:70%; padding:10px; border-radius:8px; background:rgba(255,255,255,0.1); color:#fff; border:1px solid rgba(255,255,255,0.2);" onkeypress="if(event.key==='Enter')postComment(post.id, this.value)">
+                                    <input type="text" class="comment-input" placeholder="寫下回覆</span><span class="en" style="display:none">Reply</span>...</span><span class="en" style="display:none">Write a reply...</span>" style="width:70%; padding:10px; border-radius:8px; background:rgba(255,255,255,0.1); color:#fff; border:1px solid rgba(255,255,255,0.2);" onkeypress="if(event.key==='Enter')postComment(post.id, this.value)">
                                     <button onclick="postComment(post.id, this.previousElementSibling.value)" style="padding:10px 20px; background:var(--primary); border:none; border-radius:8px; color:#000; font-weight:bold; cursor:pointer; margin-left:10px;"><span class="zh">回覆</span><span class="en" style="display:none">Reply</span></button>
                                 </div>
                             </div>
