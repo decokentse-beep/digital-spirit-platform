@@ -348,6 +348,32 @@ def handle_ai_background_command(message):
 
 
 
+
+
+def save_api_key(key):
+    """Save MiniMax API key"""
+    import json
+    import os
+    
+    config_file = os.path.expanduser("~/.driver_config")
+    config = {"minimax_api_key": key}
+    
+    with open(config_file, 'w') as f:
+        json.dump(config, f)
+    print(f"✅ API Key saved!")
+
+def load_api_key():
+    """Load MiniMax API key"""
+    import json
+    import os
+    
+    config_file = os.path.expanduser("~/.driver_config")
+    if os.path.exists(config_file):
+        with open(config_file, 'r') as f:
+            config = json.load(f)
+            return config.get("minimax_api_key")
+    return None
+
 # ==================== Credential Storage ====================
 import os
 

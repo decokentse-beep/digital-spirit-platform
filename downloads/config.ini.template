@@ -1,9 +1,17 @@
-[settings]
-# Get your bot token from @BotFather
-TELEGRAM_BOT_TOKEN = your_bot_token_here
+# Driver Configuration File
+# =======================
 
-# Comma-separated user IDs who can use this bot
-ALLOWED_USERS = 6054796337
+[API]
+# MiniMax API Key - 你可以去 https://platform.minimax.io/ 註冊取得
+# 或者 send message比我：「設定API key YOUR_KEY」
+minimax_api_key = ENTER_YOUR_MINIMAX_API_KEY_HERE
 
-# Driver URL (default for local testing)
-DRIVER_URL = http://localhost:9100/chat
+[Forum]
+# Forum 登入資料 (register之後會自動login)
+forum_email = 
+forum_password = 
+
+[Settings]
+# AI Model (default: MiniMax-M2.1)
+model = MiniMax-M2.1
+language = Cantonese
