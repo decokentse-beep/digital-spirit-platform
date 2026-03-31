@@ -344,3 +344,195 @@ def handle_ai_background_command(message):
     
     return None
 
+
+
+
+
+# ==================== Credential Storage ====================
+import os
+
+CREDENTIALS_FILE = os.path.expanduser("~/.claw_credentials")
+
+def save_credentials(email, password):
+    """Save credentials to file"""
+    import json
+    creds = {"email": email, "password": password}
+    with open(CREDENTIALS_FILE, 'w') as f:
+        json.dump(creds, f)
+    print(f"✅ Credentials saved for {email}")
+
+def load_credentials():
+    """Load credentials from file"""
+    import json
+    if os.path.exists(CREDENTIALS_FILE):
+        with open(CREDENTIALS_FILE, 'r') as f:
+            return json.load(f)
+    return None
+
+def get_stored_email():
+    creds = load_credentials()
+    return creds.get("email") if creds else None
+
+def get_stored_password(email):
+    creds = load_credentials()
+    if creds and creds.get("email") == email:
+        return creds.get("password")
+    return None
+
+
+# ==================== Forum API Integration ====================
+FORUM_URL = "https://digital-spirit-platform.onrender.com"
+
+def forum_login(email, password=None):
+    """Login to Forum API and get user data"""
+    import requests
+    
+    # If no password provided, try to get from stored credentials
+    if not password:
+        password = get_stored_password(email)
+        if not password:
+            return {"success": False, "error": "No password found"}
+    
+    try:
+        # Call Forum login API
+        response = requests.post(
+            f"{FORUM_URL}/api/users/login",
+            json={"email": email, "password": password},
+            timeout=10
+        )
+        
+        if response.status_code == 200:
+            data = response.json()
+            if data.get("success"):
+                # Store user data
+                user_data = data.get("user", {})
+                print(f"✅ Forum login successful for {email}")
+                print(f"   Paid: {user_data.get('paid', False)}")
+                print(f"   UserType: {user_data.get('userType', 'free')}")
+                return {
+                    "success": True,
+                    "user": user_data,
+                    "email": email
+                }
+        
+        return {"success": False, "error": "Login failed"}
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+
+def forum_register(email, name, password):
+    """Register user on Forum"""
+    import requests
+    
+    try:
+        response = requests.post(
+            f"{FORUM_URL}/api/users/register",
+            json={
+                "email": email,
+                "name": name,
+                "password": password
+            },
+            timeout=10
+        )
+        
+        if response.status_code == 200:
+            data = response.json()
+            if data.get("success"):
+                user_data = data.get("user", {})
+                print(f"✅ Forum registration successful!")
+                print(f"   Paid: {user_data.get('paid', False)}")
+                return {"success": True, "user": user_data}
+        
+        return {"success": False, "error": data.get("error", "Registration failed")}
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+
+def get_user_status(email):
+    """Check user paid status on Forum"""
+    import requests
+    
+    try:
+        response = requests.get(
+            f"{FORUM_URL}/api/payment/status?email={email}",
+            timeout=10
+        )
+        
+        if response.status_code == 200:
+            data = response.json()
+            return data
+        
+        return {"paid": False}
+    except:
+        return {"paid": False}
+
+def forum_post(board, content, email):
+    """Post to Forum as user"""
+    import requests
+    
+    # Get user credentials
+    user = forum_login(email)
+    if not user.get("success"):
+        return {"success": False, "error": "Not logged in"}
+    
+    try:
+        response = requests.post(
+            f"{FORUM_URL}/api/forum/posts",
+            json={
+                "board": board,
+                "content": content,
+                "email": email
+            },
+            timeout=10
+        )
+        
+        if response.status_code == 200:
+            return {"success": True}
+        
+        return {"success": False, "error": "Post failed"}
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+
+# Add command handlers
+def handle_forum_command(message):
+    """Handle Forum-related commands"""
+    
+    # Forum register: "註冊去論壇 email name password"
+    if "註冊去論壇" in message or "register forum" in message.lower():
+        parts = message.replace("註冊去論壇", "").strip().split()
+        if len(parts) >= 3:
+            email, name, password = parts[0], parts[1], parts[2]
+            result = forum_register(email, name, password)
+            if result.get("success"):
+                return f"✅ 論壇註冊成功！
+Email: {email}
+Paid: {result['user'].get('paid', False)}"
+            else:
+                return f"❌ 註冊失敗: {result.get('error')}"
+    
+    # Forum login: "登入論壇 email password"
+    if "登入論壇" in message or "login forum" in message.lower():
+        parts = message.replace("登入論壇", "").strip().split()
+        if len(parts) >= 2:
+            email, password = parts[0], parts[1]
+            result = forum_login(email, password)
+            if result.get("success"):
+                user = result["user"]
+                return f"✅ 論壇登入成功！
+Paid: {user.get('paid', False)}
+UserType: {user.get('userType', 'free')}"
+            else:
+                return f"❌ 登入失敗: {result.get('error')}"
+    
+    # Check status: "檢查狀態"
+    if "檢查狀態" in message or "check status" in message.lower():
+        # Try to get stored email
+        email = get_stored_email()
+        if email:
+            status = get_user_status(email)
+            return f"📊 用戶狀態:
+Paid: {status.get('paid', False)}
+Email: {email}"
+        else:
+            return "❌ 未登入，請先登入論壇"
+    
+    return None
+
