@@ -225,11 +225,14 @@
             }
         }
         
+        // Only add listeners if post form elements exist
         const textarea = document.getElementById('postContent');
         const charCount = document.getElementById('charCount');
-        textarea.addEventListener('input', () => {
-            charCount.textContent = textarea.value.length;
-        });
+        if (textarea && charCount) {
+            textarea.addEventListener('input', () => {
+                charCount.textContent = textarea.value.length;
+            });
+        }
         
         async function submitPost() {
             const content = document.getElementById('postContent').value.trim();
