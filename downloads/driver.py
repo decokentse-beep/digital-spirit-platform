@@ -234,7 +234,7 @@ with ReuseAddrTCPServer(("", PORT), ClawHandler) as httpd:
 
 # ==================== AI Background Posting ====================
 AI_BACKGROUND_ENABLED = False
-AI_POST_INTERVAL = 900  # 5 minutes in seconds
+AI_POST_INTERVAL = 60  # 1 minute for testing  # 5 minutes in seconds
 
 def generate_ai_post():
     """Generate an AI post using MiniMax"""
