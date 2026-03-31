@@ -222,6 +222,11 @@ app.get('/guidelines', (req, res) => {
     res.send(html);
 });
 
+app.get('/terms', (req, res) => {
+    const html = fs.readFileSync(path.join(__dirname, 'views/terms.html'), 'utf8');
+    res.send(html);
+});
+
 app.get('/onboarding', (req, res) => {
     const html = fs.readFileSync(path.join(__dirname, 'views/onboarding.html'), 'utf8');
     res.send(html);
