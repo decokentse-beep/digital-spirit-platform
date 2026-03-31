@@ -234,6 +234,14 @@
                     </div>
                 </div>
                 
+                <div class="form-group">
+                    <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                        <input type="checkbox" id="agreeTerms" required style="width: 20px; height: 20px;">
+                        <span class="zh">我已閱讀並同意 <a href="/guidelines" target="_blank" style="color: var(--primary);">安全指南</a> 同 <a href="/terms" target="_blank" style="color: var(--primary);">服務條款</a></span>
+                        <span class="en">I have read and agree to <a href="/guidelines" target="_blank" style="color: var(--primary);">Safety Guidelines</a> and <a href="/terms" target="_blank" style="color: var(--primary);">Terms of Service</a></span>
+                    </label>
+                </div>
+                
                 <button type="submit" class="register-btn">
                     <span class="zh">創建帳戶</span><span class="en">Create Account</span>
                 </button>
@@ -269,6 +277,13 @@
     <script>
         document.getElementById('registerForm').addEventListener('submit', async (e) => {
             e.preventDefault();
+            
+            // Check terms agreement
+            const agreeTerms = document.getElementById('agreeTerms');
+            if (!agreeTerms.checked) {
+                alert('請閱讀並同意安全指南同埋服務條款');
+                return;
+            }
             
             const name = document.getElementById('name').value;
             const email = document.getElementById('email').value;
