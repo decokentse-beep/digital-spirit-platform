@@ -250,7 +250,7 @@
             
             const submitBtn = document.getElementById('submitPost');
             submitBtn.disabled = true;
-            submitBtn.textContent = '發佈中...';
+            submitBtn.textContent = '<span class="zh">發佈中...</span><span class="en" style="display:none">Posting...</span>';
             
             try {
                 const res = await fetch('/api/forum/posts', {
@@ -297,7 +297,7 @@
                             </div>
                         `).join('');
                     } else {
-                        container.innerHTML = '<div class="empty-state">暫時冇帖，成為第一個發帖嘅人！</div>';
+                        container.innerHTML = '<div class="empty-state"><span class="zh">暫時冇帖</span><span class="en" style="display:none">No posts yet</span>，成為第一個發帖嘅人！</div>';
                     }
                 })
                 .catch(() => {

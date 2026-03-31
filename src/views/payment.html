@@ -227,5 +227,23 @@
         });
 
     </script>
+
+        <script>
+        async function checkPaymentStatus() {
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            if (!user.email) return;
+            
+            try {
+                const res = await fetch(`/api/payment/status?email=${user.email}`);
+                const data = await res.json();
+                
+                if (data.paid) {
+                    document.getElementById('qrSection').style.display = 'none';
+                    document.getElementById('comingSoon').style.display = 'block';
+                }
+            } catch (e) { console.error(e); }
+        }
+        checkPaymentStatus();
+        </script>
 </body>
 </html>
