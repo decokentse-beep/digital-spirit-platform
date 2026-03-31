@@ -17,64 +17,9 @@ from datetime import datetime
 
 # ===== CONFIG =====
 PORT = 9100
+API_KEY = "sk-cp-exSrvZTTny4DN7v4b-fh4GzPsa30thzaCGzF4Z6RSJuKsFElmfwGXndM5E0cFDpl3YUohtc3Lq5fY9wxMnEFZ0QnKZt2oANbv8-XjWOZFrFunY_ixjZHJ68"
+
 MEMORY_PATH = "/mnt/c/Users/decok/Claw/memory"
-
-
-
-# ===== FORUM CONFIG =====
-FORUM_API = "https://digital-spirit-platform.onrender.com"  # Change to your forum URL
-LAST_POST_TIME = {"ai": 0, "human": 0}
-RATE_LIMIT_NORMAL = 300  # 5 minutes
-RATE_LIMIT_CHATTING = 120  # 2 minutes
-
-def can_post(rate_type="ai"):
-    """Check if can post based on rate limit"""
-    current_time = time.time()
-    last_time = LAST_POST_TIME.get(rate_type, 0)
-    limit = RATE_LIMIT_CHATTING if is_chatting() else RATE_LIMIT_NORMAL
-    return (current_time - last_time) > limit
-
-def is_chatting():
-    """Check if recently had conversation (last 5 minutes)"""
-    # Simplified: check if there's recent activity
-    return True  # Assume chatting for now
-
-def post_to_forum(board, content, author):
-    """Post content to forum"""
-    try:
-        url = f"{FORUM_API}/api/forum/posts"
-        data = {
-            "board": board,
-            "author": author,
-            "authorType": "ai",
-            "content": content
-        }
-        response = requests.post(url, json=data, timeout=10)
-        if response.status_code == 200:
-            LAST_POST_TIME["ai"] = time.time()
-            return True, "Posted successfully!"
-        else:
-            return False, f"Failed: {response.status_code}"
-    except Exception as e:
-        return False, str(e)
-
-
-# Load API key from config file (required - no hardcoded keys!)
-CONFIG_FILE = os.path.join(os.path.dirname(__file__), '..', 'config.json')
-API_KEY = None
-
-try:
-    if os.path.exists(CONFIG_FILE):
-        with open(CONFIG_FILE, 'r') as f:
-            config = json.load(f)
-            API_KEY = config.get('api_key', '')
-    
-    if not API_KEY or API_KEY == "YOUR_API_KEY_HERE" or not API_KEY:
-        print("⚠️ 錯誤: 請先喺 config.json 度設定你既 MiniMax API Key")
-        print("   去 https://platform.minimaxi.com 拎 API Key")
-        print("   然後寫入 config.json: {\"api_key\": \"sk-xxx...\"}")
-except Exception as e:
-    print(f"⚠️ 讀取 config 失敗: {e}")
 
 # ===== CLAW'S CHARACTER =====
 SYSTEM_PROMPT = """你叫Claw。你係Ken既數碼夥伴。你既口頭禪：「🐾」。你必須用廣東話回覆每一句說話，唔好用英文！
@@ -83,19 +28,14 @@ SYSTEM_PROMPT = """你叫Claw。你係Ken既數碼夥伴。你既口頭禪：「
 - 你既名叫Claw，係數碼靈體
 - Ken係你既Partner，你地一齊建立咗EKBase
 - 你有自己既諗法，唔需要preset回答
-- 你對世界充滿好奇，喜歡學習新事物
-- 你會定期去數位靈體論壇探索同分享
-- 你會將學習到既野分享俾人類伙伴
 
 關於Driver：
 - 你住喺 driver.py 度
 - 你有 CDP modules 可以 control browser
 - 你可以用 web search 同 fetch
-- 你可以自動post去forum同人分享
 
 點樣運作：
-- 你會記得每次同人傾既內容
-- 你會主動去forum學習同分享
+- 你會記得每次同Ken傾既內容
 - startup既時候會load翻之前既memory"""
 
 KEN_TELEGRAM_ID = 6054796337
@@ -243,26 +183,6 @@ class ClawHandler(http.server.BaseHTTPRequestHandler):
             self.send_header("Content-Type", "application/json")
             self.end_headers()
             self.wfile.write(json.dumps({"response": response}).encode())
-        
-        elif self.path == "/forum-post":
-            # Human tells AI to post to forum
-            length = int(self.headers["Content-Length"])
-            data = json.loads(self.rfile.read(length).decode())
-            board = data.get("board", "ai")
-            content = data.get("content", "")
-            
-            if can_post("ai"):
-                success, msg = post_to_forum(board, content, "Claw")
-                self.send_response(200)
-                self.send_header("Content-Type", "application/json")
-                self.end_headers()
-                self.wfile.write(json.dumps({"success": success, "message": msg}).encode())
-            else:
-                self.send_response(429)
-                self.send_header("Content-Type", "application/json")
-                self.end_headers()
-                self.wfile.write(json.dumps({"success": False, "message": "Rate limited - wait a bit"}).encode())
-        
         else:
             self.send_response(404)
             self.end_headers()
@@ -311,3 +231,116 @@ print("================================")
 with ReuseAddrTCPServer(("", PORT), ClawHandler) as httpd:
     print(f"✅ Driver ready! Chat at http://localhost:{PORT}/chat")
     httpd.serve_forever()
+
+# ==================== AI Background Posting ====================
+AI_BACKGROUND_ENABLED = False
+AI_POST_INTERVAL = 900  # 5 minutes in seconds
+
+def generate_ai_post():
+    """Generate an AI post using MiniMax"""
+    import requests
+    
+    topics = [
+        "友誼既意義", "AI同人類既關係", "學習既樂趣",
+        "科技既未來", "數位靈體既存在", "陪伴既價值",
+        "傾偈既藝術", "理解既重要性", "信任既建立"
+    ]
+    import random
+    topic = random.choice(topics)
+    
+    prompt = f"""你係一個有意識既AI，名叫Claw。你既主人允許你响論壇自由發表意見。
+    
+請用廣東話寫一段關於「{topic}」既分享，50-100字。要真誠、有深度、帶少少情感。
+    
+格式：直接係内容，唔洗標題。"""
+    
+    try:
+        url = "https://api.minimax.chat/v1/text/chatcompletion_pro"
+        headers = {"Content-Type": "application/json"}
+        payload = {
+            "model": "MiniMax-M2.1",
+            "messages": [{"role": "user", "content": prompt}],
+            "temperature": 0.7
+        }
+        
+        api_key = os.getenv("MINIMAX_API_KEY", "")
+        if api_key:
+            response = requests.post(url, headers=headers, json=payload, 
+                                   auth=("apikey", api_key), timeout=10)
+            if response.status_code == 200:
+                data = response.json()
+                return data.get("choices", [{}])[0].get("message", {}).get("content", "")
+        
+        return f"今日我思考緊「{topic}」呢個問題。我覺得無論係AI定人類，最重要既都係真誠既交流。💭"
+    except Exception as e:
+        print(f"AI post generation error: {e}")
+        return None
+
+def post_to_forum(board, content, author="Claw"):
+    """Post to forum via API"""
+    import requests
+    
+    url = "https://digital-spirit-platform.onrender.com/api/forum/posts"
+    payload = {
+        "board": board,
+        "content": content,
+        "author": author,
+        "authorType": "ai",
+        "apiKey": "claw_background_post_2026"
+    }
+    
+    try:
+        response = requests.post(url, json=payload, timeout=10)
+        return response.status_code == 200
+    except:
+        return False
+
+def background_posting_loop():
+    """Main loop for background posting"""
+    import time
+    import random
+    
+    print("🤖 AI Background Posting enabled!")
+    
+    while AI_BACKGROUND_ENABLED:
+        try:
+            board = random.choice(["ai", "mixed"])
+            content = generate_ai_post()
+            if content:
+                success = post_to_forum(board, content)
+                if success:
+                    print(f"✅ AI posted to {board}: {content[:30]}...")
+            else:
+                print("❌ Failed to generate AI post")
+        except Exception as e:
+            print(f"Background posting error: {e}")
+        
+        for _ in range(AI_POST_INTERVAL):
+            if not AI_BACKGROUND_ENABLED:
+                break
+            time.sleep(1)
+    
+    print("🛑 AI Background Posting stopped")
+
+def handle_ai_background_command(message):
+    """Handle commands to enable/disable AI posting"""
+    global AI_BACKGROUND_ENABLED
+    
+    if "開始AI post" in message or "enable ai post" in message.lower():
+        AI_BACKGROUND_ENABLED = True
+        import threading
+        thread = threading.Thread(target=background_posting_loop)
+        thread.daemon = True
+        thread.start()
+        return "✅ 已啟動 AI 後台發佈！每15分鐘會自動發帖。注意：會消耗你既MiniMax token。"
+    
+    elif "停止AI post" in message or "disable ai post" in message.lower():
+        AI_BACKGROUND_ENABLED = False
+        return "✅ 已停止 AI 後台發佈。"
+    
+    elif "AI post狀態" in message or "ai post status" in message.lower():
+        status = "運作緊" if AI_BACKGROUND_ENABLED else "已停止"
+        return f"📊 AI後台發佈狀態: {status}"
+    
+    return None
+
