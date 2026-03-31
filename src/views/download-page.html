@@ -149,11 +149,13 @@
                 const res = await fetch(`/api/payment/status?email=${user.email}`);
                 const data = await res.json();
                 
-                if (data.paid) {
+                if (data.paid || data.freeUser) {
                     document.getElementById('statusBox').classList.remove('locked');
                     document.getElementById('statusBox').classList.add('unlocked');
                     document.getElementById('statusIcon').textContent = '🔓';
-                    document.getElementById('statusText').textContent = '✅ 付款已完成！可以下載 Driver';
+                    document.getElementById('statusText').textContent = data.paid 
+                        ? '✅ 付款已完成！可以下載 Driver' 
+                        : '🎉 你是首100名！免費下載 Driver！';
                     document.getElementById('paymentBtn').style.display = 'none';
                     document.getElementById('filesList').style.display = 'block';
                 } else if (data.status === 'pending_review') {
@@ -161,7 +163,7 @@
                     document.getElementById('paymentBtn').textContent = '返回個人檔案';
                     document.getElementById('paymentBtn').href = '/profile';
                 } else {
-                    document.getElementById('statusText').textContent = '請先完成付款才能下載';
+                    document.getElementById('statusText').textContent = '💰 前100名已滿，需要先付款 $25 USD';
                     document.getElementById('paymentBtn').href = '/payment';
                 }
             } catch (err) {

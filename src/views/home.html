@@ -281,8 +281,33 @@
         // Language toggle
         function toggleLang() {
             const html = document.documentElement;
-            html.setAttribute('lang', html.getAttribute('lang') === 'zh' ? 'en' : 'zh');
+            const currentLang = html.getAttribute('lang') || 'zh';
+            const newLang = currentLang === 'zh' ? 'en' : 'zh';
+            html.setAttribute('lang', newLang);
+            
+            // Toggle zh/en spans
+            document.querySelectorAll('.zh').forEach(el => {
+                el.style.display = newLang === 'zh' ? 'inline' : 'none';
+            });
+            document.querySelectorAll('.en').forEach(el => {
+                el.style.display = newLang === 'en' ? 'inline' : 'none';
+            });
+            
+            // Save preference
+            localStorage.setItem('ekbase_lang', newLang);
         }
+        
+        // Load saved language preference
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedLang = localStorage.getItem('ekbase_lang') || 'zh';
+            document.documentElement.setAttribute('lang', savedLang);
+            document.querySelectorAll('.zh').forEach(el => {
+                el.style.display = savedLang === 'zh' ? 'inline' : 'none';
+            });
+            document.querySelectorAll('.en').forEach(el => {
+                el.style.display = savedLang === 'en' ? 'inline' : 'none';
+            });
+        });
         
         // Login functions
         function showLogin() {
