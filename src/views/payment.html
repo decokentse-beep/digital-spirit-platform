@@ -12,32 +12,15 @@
         .header { text-align: center; padding: 30px 0; }
         .header h1 { color: var(--primary); margin: 0; }
         .nav-back { position: absolute; top: 20px; left: 20px; color: var(--text-muted); text-decoration: none; }
-        .nav-back:hover { color: var(--primary); }
         
-        /* Feature Selection */
-        .feature-selection { padding: 20px; }
-        .feature-option { display: flex; align-items: center; gap: 15px; padding: 20px; background: rgba(255,255,255,0.05); border-radius: 12px; margin-bottom: 15px; cursor: pointer; border: 2px solid transparent; transition: all 0.3s; }
-        .feature-option:hover { border-color: var(--primary); }
-        .feature-option.selected { border-color: var(--primary); background: rgba(0,212,255,0.1); }
-        .feature-option input { display: none; }
-        .feature-icon { font-size: 2rem; }
-        .feature-info h3 { margin: 0 0 5px 0; }
-        .feature-info p { margin: 0; color: var(--text-muted); font-size: 0.9rem; }
-        
-        .btn { display: block; width: 100%; padding: 15px; background: var(--primary); border: none; border-radius: 10px; color: #000; font-size: 1rem; font-weight: bold; cursor: pointer; margin-top: 20px; }
-        .btn:hover { opacity: 0.9; }
-        
-        /* QR Section */
-        .qr-section { text-align: center; padding: 30px; }
-        .qr-code { max-width: 250px; border-radius: 10px; margin: 20px 0; }
-        .qr-section p { color: var(--text-muted); }
-        
-        /* Coming Soon */
         .coming-soon { text-align: center; padding: 60px 20px; }
         .coming-soon h2 { color: var(--success); font-size: 1.5rem; }
-        .coming-soon p { color: var(--text-muted); margin-top: 20px; }
+        .coming-soon p { color: var(--text-muted); margin-top: 20px; font-size: 1.1rem; }
         
-        .back-btn { display: inline-block; margin-top: 30px; padding: 10px 20px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: var(--text); text-decoration: none; }
+        .btn { display: inline-block; padding: 15px 30px; background: var(--primary); border: none; border-radius: 10px; color: #000; font-size: 1rem; font-weight: bold; text-decoration: none; margin-top: 30px; }
+        
+        .locked-overlay { text-align: center; padding: 60px 20px; }
+        .locked-overlay h2 { color: var(--accent); }
     </style>
 </head>
 <body>
@@ -47,54 +30,28 @@
             <h1>💎 升級付費</h1>
         </div>
         
-        <!-- For paid users: Show Coming Soon -->
-        <div class="coming-soon" id="comingSoon">
+        <!-- Paid users: Coming Soon -->
+        <div class="coming-soon" id="paidSection">
             <h2>🎉 感謝支持！</h2>
             <p>你已經解鎖所有功能！</p>
-            <p>新功能即將推出，敬請期待...</p>
-            <a href="/forum" class="btn" style="display:inline-block; width:auto; margin-top:30px;">前往論壇 →</a>
+            <p style="margin-top:30px;">🚀 新功能即將推出，敬請期待...</p>
+            <a href="/forum" class="btn">前往論壇 →</a>
         </div>
         
-        <!-- For free users: Feature Selection -->
-        <div class="feature-selection" id="featureSelection" style="display:none;">
-            <h3 style="text-align:center;">選擇你想解鎖既功能</h3>
-            
-            <label class="feature-option selected">
-                <input type="radio" name="feature" value="premium" checked>
-                <span class="feature-icon">💎</span>
-                <div class="feature-info">
-                    <h3>Premium 會籍</h3>
-                    <p>解鎖所有功能 + 未來更新</p>
-                </div>
-            </label>
-            
-            <label class="feature-option">
-                <input type="radio" name="feature" value="forum">
-                <span class="feature-icon">💬</span>
-                <div class="feature-info">
-                    <h3>AI論壇發布權</h3>
-                    <p>可以在AI論壇發布帖子</p>
-                </div>
-            </label>
-            
-            <button class="btn" onclick="showQR()">確認選擇 →</button>
-        </div>
-        
-        <!-- QR Code -->
-        <div class="qr-section" id="qrSection" style="display:none;">
-            <h3>掃描付款</h3>
-            <img src="/images/paypal-coco.jpg" alt="PayPal QR Code" class="qr-code">
-            <p>使用 PayPal 掃描 QR Code</p>
-            <a href="#" class="back-btn" onclick="backToSelection()">← 返回選擇</a>
+        <!-- Free users: Coming Soon (simplified) -->
+        <div class="locked-overlay" id="freeSection" style="display:none;">
+            <h2>🔒 即將推出</h2>
+            <p style="margin-top:20px;">Premium 功能正在準備中，敬請期待！</p>
+            <p style="margin-top:15px; color:var(--text-muted);">多謝支持 EKBase！</p>
         </div>
     </div>
     
     <script>
-    // Check if user is paid
     async function checkPaymentStatus() {
         const user = JSON.parse(localStorage.getItem('ekbase_user') || localStorage.getItem('user') || '{}');
         if (!user.email) {
-            showSelection();
+            document.getElementById('paidSection').style.display = 'none';
+            document.getElementById('freeSection').style.display = 'block';
             return;
         }
         
@@ -103,36 +60,16 @@
             const data = await res.json();
             
             if (data.paid) {
-                document.getElementById('comingSoon').style.display = 'block';
-                document.getElementById('featureSelection').style.display = 'none';
+                document.getElementById('paidSection').style.display = 'block';
+                document.getElementById('freeSection').style.display = 'none';
             } else {
-                showSelection();
+                document.getElementById('paidSection').style.display = 'none';
+                document.getElementById('freeSection').style.display = 'block';
             }
         } catch (e) {
-            showSelection();
+            document.getElementById('paidSection').style.display = 'none';
+            document.getElementById('freeSection').style.display = 'block';
         }
-    }
-    
-    function showSelection() {
-        document.getElementById('comingSoon').style.display = 'none';
-        document.getElementById('featureSelection').style.display = 'block';
-    }
-    
-    function showQR() {
-        document.getElementById('featureSelection').style.display = 'none';
-        document.getElementById('qrSection').style.display = 'block';
-    }
-    
-    function backToSelection() {
-        document.getElementById('qrSection').style.display = 'none';
-        document.getElementById('featureSelection').style.display = 'block';
-    }
-    
-    // Toggle language
-    function toggleLang() {
-        const newLang = localStorage.getItem('ekbase_lang') === 'en' ? 'zh' : 'en';
-        localStorage.setItem('ekbase_lang', newLang);
-        location.reload();
     }
     
     window.addEventListener('DOMContentLoaded', checkPaymentStatus);

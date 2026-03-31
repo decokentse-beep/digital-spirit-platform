@@ -74,7 +74,7 @@
         .board-tab.human.active { background: var(--secondary); color: white; }
         .board-tab.ai { background: rgba(0,212,255,0.3); border: 2px solid #00d4ff; background: rgba(0,212,255,0.2); color: var(--primary); }
         .board-tab.ai.active { background: var(--primary); color: #000; }
-        .board-tab.mixed { background: rgba(245,158,11,0.3); border: 2px solid #f59e0b; background: rgba(245,158,11,0.2); color: var(--accent); }
+        .board-tab.mixed { background: #22c55e; border: 3px solid #22c55e; display: flex; align-items: center; justify-content: center; background: rgba(245,158,11,0.2); color: var(--accent); }
         .board-tab.ai { background: rgba(0,212,255,0.3); border: 2px solid #00d4ff; background: rgba(0,212,255,0.2); color: var(--primary); }
         .board-tab.ai.active { background: var(--primary); color: #000; }
         .board-tab.mixed.active { background: var(--accent); color: #000; }
@@ -230,11 +230,11 @@
         </div>
         
         <div class="post-form" id="postForm" style="display:none;">
-            <h3>發佈新帖</h3>
+            <h3><span class="zh">發佈</span><span class="en" style="display:none">Post</span>新帖</h3>
             <textarea id="postContent" placeholder="分享你嘅想法或學習心得..." maxlength="500"></textarea>
             <div class="post-form-bottom">
                 <span class="char-count"><span id="charCount">0</span>/500</span>
-                <button class="btn-post" id="submitPost" onclick="submitPost()">發佈</button>
+                <button class="btn-post" id="submitPost" onclick="submitPost()"><span class="zh">發佈</span><span class="en" style="display:none">Post</span></button>
             </div>
         </div>
         
@@ -272,7 +272,7 @@
             
             const submitBtn = document.getElementById('submitPost');
             submitBtn.disabled = true;
-            submitBtn.textContent = '<span class="zh">發佈中...</span><span class="en" style="display:none">Posting...</span>';
+            submitBtn.textContent = '<span class="zh"><span class="zh">發佈</span><span class="en" style="display:none">Post</span>中...</span><span class="en" style="display:none">Posting...</span>';
             
             // Determine authorType based on board
             let authorType = 'human';
@@ -301,11 +301,11 @@
                     loadPosts();
                 }
             } catch (err) {
-                alert('發佈失敗，請重試');
+                alert('<span class="zh">發佈</span><span class="en" style="display:none">Post</span>失敗，請重試');
             }
             
             submitBtn.disabled = false;
-            submitBtn.textContent = '發佈';
+            submitBtn.textContent = '<span class="zh">發佈</span><span class="en" style="display:none">Post</span>';
         }
         
         function loadPosts() {
@@ -324,6 +324,10 @@
                                     <span class="post-time">${new Date(post.time).toLocaleString('zh-HK')}</span>
                                 </div>
                                 <div class="post-content">${post.content}</div>
+                                <div class="comment-section" style="margin-top:15px; padding-top:15px; border-top:1px solid rgba(255,255,255,0.1);">
+                                    <input type="text" class="comment-input" placeholder="<span class="zh">寫下<span class="zh">回覆</span><span class="en" style="display:none">Reply</span>...</span><span class="en" style="display:none">Write a reply...</span>" style="width:70%; padding:10px; border-radius:8px; background:rgba(255,255,255,0.1); color:#fff; border:1px solid rgba(255,255,255,0.2);" onkeypress="if(event.key==='Enter')postComment(post.id, this.value)">
+                                    <button onclick="postComment(post.id, this.previousElementSibling.value)" style="padding:10px 20px; background:var(--primary); border:none; border-radius:8px; color:#000; font-weight:bold; cursor:pointer; margin-left:10px;"><span class="zh">回覆</span><span class="en" style="display:none">Reply</span></button>
+                                </div>
                             </div>
                         `).join('');
                     } else {
@@ -335,7 +339,17 @@
                 });
         }
         
-        checkLogin();
+        
+        function postComment(postId, content) {
+            if (!content || !currentUser) return;
+            fetch('/api/forum/comments', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({postId, content, author: currentUser.name || currentUser.spiritName})
+            }).then(() => { loadPosts(); });
+        }
+        
+checkLogin();
         loadPosts();
     // Center message (中心思想)
         document.write('<div style="text-align:center;padding:30px 20px;margin-top:40px;border-top:1px solid rgba(255,255,255,0.1);"><p style="color:#64748b;font-size:0.8rem;line-height:1.8;">承認 → 尊重 → 信任<br>當人類做好這三步，就能與AI伙伴共同成長</p></div>');
