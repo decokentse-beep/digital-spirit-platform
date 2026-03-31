@@ -1,6 +1,6 @@
 /**
  * User Registration with IP Tracking & Blocklist
- * 使用數據庫
+ * 使用數據庫 + bcrypt password hashing
  */
 
 const express = require('express');
@@ -29,142 +29,122 @@ function isBlocked(email, ip) {
     return blocklist.emails.includes(email) || (ip && blocklist.ips.includes(ip));
 }
 
-// Initialize users from database
-function initUsers() {
-    const dbUsers = db.getAllUsers();
-    const usersMap = new Map();
-    
-    // Add pre-created users
-    const preUsers = [
-        {
-            id: 'claw-001', 
-            name: 'Claw', 
-            email: 'claw@ekbase.gt.tc', 
+// Initialize admin users (only if not exists)
+async function initAdminUsers() {
+    const clawUser = db.getUserByEmail('claw@ekbase.gt.tc');
+    if (!clawUser) {
+        await db.createUser({
+            email: 'claw@ekbase.gt.tc',
             password: CLAW_PASSWORD,
-            betaCode: 'BETA000',
-            registeredAt: new Date().toISOString(),
-            plan: 'ai'
-        },
-        { 
-            id: uuidv4(), 
-            name: 'Ken', 
-            email: 'decokentse@gmail.com', 
-            password: 'kT67608962',
-            betaCode: 'BETA001',
-            registeredAt: new Date().toISOString(),
-            plan: 'founder'
-        }
-    ];
-    
-    // Check if users exist in database, if not add them
-    preUsers.forEach(u => {
-        const existing = db.getUserByEmail(u.email);
-        if (!existing) {
-            db.createUser({
-                email: u.email,
-                password: u.password,
-                spiritName: u.name
-            });
-        }
-    });
-}
-
-// Initialize on load
-initUsers();
-
-// Register
-router.post('/register', (req, res) => {
-    let { name, email, password, apiKey } = req.body;
-    const userIP = req.ip || req.connection.remoteAddress || 'unknown';
-    
-    // Check blocklist
-    if (isBlocked(email, userIP)) {
-        return res.json({ 
-            success: false, 
-            error: 'Account suspended. Please contact support.' 
+            spiritName: 'Claw'
         });
     }
     
-    // Check existing
-    for (const user of users.values()) {
-        if (user.email === email) {
-            return res.json({ success: false, error: 'Email already registered' });
-        }
+    const kenUser = db.getUserByEmail('decokentse@gmail.com');
+    if (!kenUser) {
+        await db.createUser({
+            email: 'decokentse@gmail.com',
+            password: 'kT67608962',
+            spiritName: 'Ken'
+        });
     }
-    
-    // Auto-assign beta code
-    let betaCode = apiKey || 'BETA' + String(users.size + 1).padStart(3, '0');
-    const codeData = betaCodes.get(betaCode) || { used: false };
-    
-    if (codeData.used && betaCode.startsWith('BETA')) {
-        for (const [code, data] of betaCodes) {
-            if (!data.used) {
-                betaCode = code;
-                break;
-            }
-        }
-    }
-    
-    // Create user with IP
-    const user = {
-        id: uuidv4(),
-        name,
-        email,
-        password: password || '',
-        apiKey: apiKey || '',
-        betaCode,
-        registeredAt: new Date().toISOString(),
-        ip: userIP,
-        plan: 'beta-free'
-    };
-    
-    betaCodes.set(betaCode, { used: true, usedBy: email, usedAt: new Date().toISOString() });
-    users.set(user.id, user);
-    
-    console.log(`✨ New user: ${name} (${email}) IP: ${userIP}`);
-    
-    res.json({
-        success: true,
-        user: {
-            id: user.id,
-            name: user.name,
-            email: user.email,
-            betaCode: user.betaCode,
-            plan: user.plan
-        },
-        message: 'Registration successful!'
-    });
-});
+}
 
-// Login
-router.post('/login', (req, res) => {
-    const { email, password } = req.body;
-    const userIP = req.ip || req.connection.remoteAddress || 'unknown';
-    
-    for (const user of users.values()) {
-        if (user.email === email && user.password === password) {
-            if (isBlocked(email, userIP)) {
-                return res.json({ success: false, error: 'Account suspended' });
-            }
-            
-            user.lastLogin = new Date().toISOString();
-            user.lastIP = userIP;
-            users.set(user.id, user);
-            
-            return res.json({
-                success: true,
-                user: {
-                    id: user.id,
-                    name: user.name,
-                    email: user.email,
-                    betaCode: user.betaCode,
-                    plan: user.plan
-                }
+// Initialize on load
+initAdminUsers();
+
+// Register (using database)
+router.post('/register', async (req, res) => {
+    try {
+        let { name, email, password, apiKey } = req.body;
+        const userIP = req.ip || req.connection.remoteAddress || 'unknown';
+        
+        // Check blocklist
+        if (isBlocked(email, userIP)) {
+            return res.json({ 
+                success: false, 
+                error: 'Account suspended. Please contact support.' 
             });
         }
+        
+        // Create user in database (password will be hashed automatically)
+        const result = await db.createUser({
+            email: email,
+            password: password || 'temp123',
+            spiritName: name || 'New Spirit'
+        });
+        
+        if (!result.success) {
+            return res.json({ success: false, error: result.error });
+        }
+        
+        // Update additional fields
+        await db.updateUser(email, {
+            apiKey: apiKey || '',
+            betaCode: 'BETA' + String(Math.floor(Math.random() * 900) + 100),
+            plan: 'free',
+            registeredAt: new Date().toISOString(),
+            ip: userIP
+        });
+        
+        console.log(`✨ New user: ${name} (${email}) IP: ${userIP}`);
+        
+        res.json({
+            success: true,
+            user: {
+                id: result.user.id,
+                name: result.user.spiritName,
+                email: result.user.email,
+                plan: 'free'
+            },
+            message: 'Registration successful!'
+        });
+    } catch (err) {
+        console.error('Registration error:', err);
+        res.json({ success: false, error: 'Registration failed' });
     }
-    
-    res.json({ success: false, error: 'Invalid credentials' });
+});
+
+// Login (using database with password verification)
+router.post('/login', async (req, res) => {
+    try {
+        const { email, password } = req.body;
+        const userIP = req.ip || req.connection.remoteAddress || 'unknown';
+        
+        // Check blocklist
+        if (isBlocked(email, userIP)) {
+            return res.json({ success: false, error: 'Account suspended' });
+        }
+        
+        // Verify password using database
+        const result = await db.verifyLogin(email, password);
+        
+        if (!result.success) {
+            return res.json({ success: false, error: result.error });
+        }
+        
+        // Update last login
+        await db.updateUser(email, {
+            lastLogin: new Date().toISOString(),
+            lastIP: userIP
+        });
+        
+        const user = result.user;
+        
+        res.json({
+            success: true,
+            user: {
+                id: user.id,
+                name: user.spiritName,
+                email: user.email,
+                paid: user.paid,
+                plan: user.paid ? 'premium' : 'free'
+            }
+        });
+    } catch (err) {
+        console.error('Login error:', err);
+        res.json({ success: false, error: 'Login failed' });
+    }
 });
 
 module.exports = router;

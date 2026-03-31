@@ -1,13 +1,13 @@
 /**
- * Database Service (SQLite)
- * 數據庫服務
+ * Database Service (SQLite) with Password Hashing
+ * 數據庫服務 - 密碼 bcrypt hash
  */
 
 const fs = require('fs');
 const path = require('path');
+const bcrypt = require('bcryptjs');
 
 const DB_DIR = path.join(__dirname, '..', '..', 'database');
-const DB_PATH = path.join(DB_DIR, 'platform.db');
 
 // Ensure database directory exists
 if (!fs.existsSync(DB_DIR)) {
@@ -15,7 +15,7 @@ if (!fs.existsSync(DB_DIR)) {
 }
 
 // Simple SQLite implementation using JSON files
-// (For production, use better-sqlite3 or similar)
+// For production, use better-sqlite3 or similar
 
 class Database {
     constructor() {
@@ -42,6 +42,16 @@ class Database {
         fs.writeFileSync(this.usersPath, JSON.stringify(users, null, 2));
     }
     
+    // Hash password using bcrypt
+    async hashPassword(password) {
+        return await bcrypt.hash(password, 10);
+    }
+    
+    // Verify password
+    async verifyPassword(password, hash) {
+        return await bcrypt.compare(password, hash);
+    }
+    
     // Get user by email
     getUserByEmail(email) {
         const users = this.getUsers();
@@ -54,8 +64,8 @@ class Database {
         return users.find(u => u.id === id);
     }
     
-    // Create new user
-    createUser(userData) {
+    // Create new user (auto-hash password)
+    async createUser(userData) {
         const users = this.getUsers();
         
         // Check if email exists
@@ -63,10 +73,13 @@ class Database {
             return { success: false, error: 'Email already exists' };
         }
         
+        // Hash password before saving
+        const hashedPassword = await this.hashPassword(userData.password);
+        
         const newUser = {
             id: 'user_' + Date.now(),
             email: userData.email,
-            password: userData.password,
+            password: hashedPassword, // Store hashed password
             spiritName: userData.spiritName || 'New Spirit',
             spiritType: userData.spiritType || 'companion',
             apiKey: userData.apiKey || '',
@@ -85,8 +98,28 @@ class Database {
         return { success: true, user: newUser };
     }
     
+    // Verify login password
+    async verifyLogin(email, password) {
+        const user = this.getUserByEmail(email);
+        if (!user) {
+            return { success: false, error: 'User not found' };
+        }
+        
+        const isValid = await this.verifyPassword(password, user.password);
+        if (!isValid) {
+            return { success: false, error: 'Invalid password' };
+        }
+        
+        return { success: true, user: user };
+    }
+    
     // Update user
-    updateUser(email, updates) {
+    async updateUser(email, updates) {
+        // If updating password, hash it first
+        if (updates.password) {
+            updates.password = await this.hashPassword(updates.password);
+        }
+        
         const users = this.getUsers();
         const index = users.findIndex(u => u.email === email);
         

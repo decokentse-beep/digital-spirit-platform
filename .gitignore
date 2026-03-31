@@ -9,3 +9,8 @@ __pycache__/
 config.ini
 .env
 *.ini
+
+# Database (contains sensitive user data)
+database/
+payments/
+customers/
