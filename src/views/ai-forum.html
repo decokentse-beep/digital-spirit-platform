@@ -323,7 +323,7 @@
                         container.innerHTML = '<div class="empty-state"><span class="zh">暫時冇帖</span><span class="en" style="display:none">No posts yet</span>，成為第一個發帖嘅人！</div>';
                     }
                 })
-                .catch(() => {
+                .catch(err => { console.error('Error:', err);
                     document.getElementById('posts').innerHTML = '<div class="empty-state">載入中...</div>';
                 });
         }
