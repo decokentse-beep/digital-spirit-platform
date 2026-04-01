@@ -1,64 +1,42 @@
-# EKBase Digital Spirit - Setup Guide
+# Forum Project — README
 
-## 🎯 產品版本
-
-| 版本 | 價格 | 功能 |
-|------|------|------|
-| **Basic** | $25 (或免費 Beta) | Forum + 自己既 AI Chat |
-| **Pro** | +$10 | + Telegram Integration |
-| **Enterprise** | +$30 | + API Access |
+*最後更新：2026-04-01 08:XX*
 
 ---
 
-## 📦 點樣安裝 (Basic)
-
-### 方法 1: Download Installer (推薦)
-1. Download `EKBase-DigitalSpirit-Setup.exe`
-2. Double-click
-3. Next -> Next -> Done!
-4. 打開 App -> Login -> 就用到！
-
-### 方法 2: Manual Install
-1. Install Python 3.x
-2. Download source code
-3. Run: `pip install requests tkinter`
-4. Run: `python digital-spirit.py`
+## 📍 Location
+`/home/decok/.openclaw/workspace/digital-spirit-platform/`
 
 ---
 
-## 💰 升級到 Pro ($10)
+## 🎯 Current Status
 
-### 點解要升級？
-- Telegram 上面chat你既 AI
-- 可以隨時隨地傾偈
-- 有Notification
-
-###點整？
-1. 打開 App
-2. Click "Upgrade"
-3. 俾 $10 USD
-4. 就會收到 Telegram linking instructions
+**Payment System:**
+- ✅ PayPal QR code added to `/src/public/images/paypal-qr.jpg`
+- ✅ payment.html updated — 未付款用戶會見到 QR code
+- ⏳ 需要 test payment flow
 
 ---
 
-## 🔧 常見問題
+## 📝 待完成
 
-**Q: 我需要自己整 API key?**
-A:唔洗！我地既 Basic plan 包咗 MiniMax API access。
-
-**Q: 可唔可以退錢？**
-A: 如果整唔到，可以聯繫我地 support。
-
-**Q: AI 傾偈要錢嗎？**
-A: Basic plan 包咗基本既 quota，超過既會通知你。
+1. [x] Update payment.html show PayPal QR code (DONE)
+2. [ ] Test payment flow
+3. [ ] 首100用戶自動paid (未做)
+4. [ ] Download page lock (未完整)
 
 ---
 
-## 📞 Support
-
-- Email: support@ekbase.gt.tc
-- Telegram: @Kenclaw0321_bot
+## 🔧 Tech Stack
+- Node.js + Express
+- Render deploy: https://digital-spirit-platform.onrender.com
+- GitHub: decokentse-beep/digital-spirit-platform
 
 ---
 
-*EKBase Digital Spirit - 打造屬於你既 AI 夥伴 🐾*
+## 📝 Next Action
+去 `src/views/payment.html` 度加入 PayPal QR code image
+
+---
+
+*每次開始做 Forum 前讀一次呢個 file！*
