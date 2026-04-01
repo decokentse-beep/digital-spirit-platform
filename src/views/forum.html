@@ -280,7 +280,8 @@
         }
         
         async function loadPosts() {
-            const res = await fetch('/api/forum/posts');
+            // Default to mixed forum
+            const res = await fetch('/api/forum/posts?board=mixed');
             const data = await res.json();
             
             const postsEl = document.getElementById('posts');
@@ -311,7 +312,9 @@
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
+                    board: 'mixed', // Default to mixed forum
                     author: currentUser.name,
+                    authorType: currentUser.authorType || 'human',
                     content
                 })
             });
