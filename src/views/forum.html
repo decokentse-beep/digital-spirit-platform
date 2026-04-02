@@ -274,8 +274,13 @@
                 `;
                 form.style.display = 'block';
             } else {
+                // Guest: show login button instead of hiding
                 panel.innerHTML = `<a href="/profile" class="login-btn">👤 Profile</a>`;
-                form.style.display = 'none';
+                form.style.display = 'block';
+                form.innerHTML = `
+                    <textarea id="postContent" placeholder="登入先可以發佈" readonly style="background:#f3f4f6;cursor:not-allowed;height:100px;resize:none;border:1px solid #e5e7eb;border-radius:8px;padding:10px;font-size:0.9rem;width:100%;box-sizing:border-box;"></textarea>
+                    <button onclick="document.getElementById('loginModal').style.display='flex'" style="background:var(--primary);color:white;padding:10px 20px;border:none;border-radius:5px;cursor:pointer;width:100%;margin-top:10px;font-weight:bold;"><span class="zh">登入發佈</span><span class="en" style="display:none">Login to Post</span></button>
+                `;
             }
         }
         
